@@ -3,6 +3,7 @@ package LosPrimos.Durango.calculadoragastos.data.daos
 import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
 import androidx.room.*
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface IngresoDao {
@@ -19,5 +20,5 @@ interface IngresoDao {
     fun getAllIngresos(): Flow<List<Ingreso>>
 
     @Query("SELECT SUM(monto) FROM ingresos WHERE fecha BETWEEN :inicio AND :fin")
-    fun getTotalIngresosRango(inicio: Int, fin: Long): Flow<Double?>
+    fun getTotalIngresosPeriodo(inicio: Date, fin: Date): Flow<List<Ingreso?>>
 }

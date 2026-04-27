@@ -15,6 +15,4 @@ interface PresupuestoDao {
     @Delete
     suspend fun deletePresupuesto(presupuesto: Presupuesto)
 
-    @Query("SELECT * FROM presupuestos WHERE idUsuario = :idUsuario AND mes = :mes AND anio = :anio LIMIT 1")
-    fun getPresupuestoMes(idUsuario: Int, mes: Int, anio: Int): Flow<Presupuesto?>
 }

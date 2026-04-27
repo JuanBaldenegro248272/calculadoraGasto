@@ -16,13 +16,4 @@ interface UsuarioDao {
 
     @Update
     suspend fun updateUsuario(usuario: Usuario)
-
-    @Delete
-    suspend fun deleteUsuario(usuario: Usuario)
-
-    @Query("SELECT * FROM usuarios")
-    fun getAllUsuarios(): Flow<List<Usuario>>
-
-    @Query("SELECT * FROM usuarios WHERE idUsuario = :idUsuario")
-    suspend fun getUsuarioById(idUsuario: Int): Usuario?
 }
