@@ -1,6 +1,6 @@
-package LosPrimos.Durango.calculadoragastos.model
+package LosPrimos.Durango.calculadoragastos.data.entities
 
-import LosPrimos.Durango.calculadoragastos.model.enums.TipoPago
+import LosPrimos.Durango.calculadoragastos.data.enums.TipoPago
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.ForeignKey
@@ -44,7 +44,7 @@ import androidx.room.Index
 data class Gasto(
     @PrimaryKey(autoGenerate = true)
     val idGasto: Int,
-    val idUsuarioPaga: Int,
+    val idUsuario: Int,
     val idCategoria: Int,
     val idGrupo: Int?,
     val idTarjeta: Int?,

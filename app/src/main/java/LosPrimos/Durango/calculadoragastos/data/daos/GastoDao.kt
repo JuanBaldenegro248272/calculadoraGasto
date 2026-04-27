@@ -1,0 +1,26 @@
+package LosPrimos.Durango.calculadoragastos.data.daos
+
+import androidx.room.*
+import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface GastoDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertGasto(gasto: Gasto): Int
+
+    @Update
+    suspend fun updateGasto(gasto: Gasto)
+
+    @Delete
+    suspend fun deleteGasto(gasto: Gasto)
+
+    @Query("SELECT * FROM gastos WHERE idUsuario = :idUsuario ORDER BY fecha DESC")
+    fun getGastosByUsuario(idUsuario: Int): Flow<List<Gasto>>
+
+    @Query("SELECT SUM(monto) FROM gastos WHERE idUsuario = :idUsuario AND fecha BETWEEN :inicio AND :fin")
+    fun getTotalGastosUsuarioRango(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?>
+    
+    @Query("SELECT * FROM gastos WHERE idGrupo = :idGrupo ORDER BY fecha DESC")
+    fun getGastosByGrupo(idGrupo: Int): Flow<List<Gasto>>
+}

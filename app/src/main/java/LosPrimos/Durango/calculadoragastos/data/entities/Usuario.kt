@@ -1,4 +1,4 @@
-package LosPrimos.Durango.calculadoragastos.model
+package LosPrimos.Durango.calculadoragastos.data.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

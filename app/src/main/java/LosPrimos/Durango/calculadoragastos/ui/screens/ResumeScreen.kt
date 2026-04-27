@@ -1,13 +1,10 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
-import LosPrimos.Durango.calculadoragastos.model.Gasto
+import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.ui.components.BalanceCard
-import LosPrimos.Durango.calculadoragastos.ui.components.BudgetSummary
 import LosPrimos.Durango.calculadoragastos.ui.components.GastoRow
 import LosPrimos.Durango.calculadoragastos.ui.components.MoreButton
 import LosPrimos.Durango.calculadoragastos.ui.components.ProfileHeader
-import LosPrimos.Durango.calculadoragastos.ui.components.SummaryHeader
-import LosPrimos.Durango.calculadoragastos.ui.components.TransactionButtons
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
