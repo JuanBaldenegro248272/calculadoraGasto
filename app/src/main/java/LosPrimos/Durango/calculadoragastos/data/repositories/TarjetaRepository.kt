@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.Flow
 class TarjetaRepository(private val tarjetaDao: TarjetaDao){
 
     suspend fun insertTarjeta(tarjeta: Tarjeta): Int{
-        return insertTarjeta(tarjeta)
+        return tarjetaDao.insertTarjeta(tarjeta)
     }
 
     suspend fun updateTarjeta(tarjeta: Tarjeta){
-        updateTarjeta(tarjeta)
+        tarjetaDao.updateTarjeta(tarjeta)
     }
 
     suspend fun getAllTarjetas(): Flow<List<Tarjeta?>>{

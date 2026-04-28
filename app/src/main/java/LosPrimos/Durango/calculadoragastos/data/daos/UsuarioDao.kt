@@ -12,8 +12,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UsuarioDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUsuario(usuario: Usuario): Int
+    suspend fun insertUsuario(usuario: Usuario): Long
 
     @Update
     suspend fun updateUsuario(usuario: Usuario)
+
+    @Query("SELECT * FROM Usuario WHERE correo = :correo AND hashContrasena = :contrasena LIMIT 1")
+    suspend fun loginUsuario(correo: String, contrasena: String): Usuario?
+
 }
