@@ -1,10 +1,13 @@
 package LosPrimos.Durango.calculadoragastos.viewModel
 
+import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
+import LosPrimos.Durango.calculadoragastos.data.entities.Usuario
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
 
 sealed class AuthState {
     object Idle : AuthState()
@@ -43,7 +46,7 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
                     _authState.value = AuthState.Error("Correo o contraseña incorrectos")
                 }
             } catch (e: Exception) {
-                _authState.value = AuthState.Error("Error inesperado: ${e.message}")
+                _authState.value = AuthState.Error("Error: ${e.message}")
             }
         }
     }
@@ -57,5 +60,14 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
 
     fun resetState() {
         _authState.value = AuthState.Idle
+    }
+
+
+    private val _usuarioRecordado = MutableStateFlow<Usuario?>(null)
+    val usuarioRecordado: StateFlow<Usuario?> = _usuarioRecordado.asStateFlow()
+
+    fun desvincularCuenta() {
+        // Función para el botón "No Eres Hector?"
+        _usuarioRecordado.value = null
     }
 }

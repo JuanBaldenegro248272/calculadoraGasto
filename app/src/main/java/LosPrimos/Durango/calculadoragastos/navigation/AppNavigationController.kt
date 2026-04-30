@@ -1,10 +1,14 @@
 package LosPrimos.Durango.calculadoragastos.navigation
 
+import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.R.attr.defaultValue
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -45,45 +49,61 @@ fun AppNavigationController(
     navController: NavHostController,
     authViewModel: AuthViewModel
 ) {
-    // Observar el estado de la sesión
     val loggedIn by authViewModel.isLoggedIn.collectAsState()
 
     NavHost(
         navController = navController,
-        // Si está logueado va al Menú, si no al Login
         startDestination = if (loggedIn) Screen.MenuPrincipal.route else Screen.Login.route
     ) {
-        // flujo de autenticacion
+
+
         composable(Screen.Login.route) {
-            LoginScreen(navController, authViewModel)
+            LoginScreen(
+                viewModel = authViewModel,
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
+                },
+                onLoginSuccess = {
+                    navController.navigate(Screen.MenuPrincipal.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
         }
+
+        composable(Screen.MenuPrincipal.route) {
+            Text("¡Bienvenido al Menú Principal!", modifier = Modifier.fillMaxSize())
+        }
+
+
+
         composable(Screen.Register.route) {
-            RegisterScreen(navController, authViewModel)
+            // RegisterScreen(
+            //     viewModel = authViewModel,
+            //     onNavigateBack = { navController.popBackStack() }
+            // )
         }
 
         // navegacion inferior
         composable(Screen.MenuPrincipal.route) {
-            ResumeScreen(navController)
+            //ResumeScreen(navController)
         }
 
         composable(Screen.Grupos.route) {
-            GruposScreen(navController)
+            //GruposScreen(navController)
         }
 
         composable(Screen.Graficas.route) {
-            GraficasScreen(navController)
+            //GraficasScreen(navController)
         }
 
         composable(Screen.Presupuestos.route) {
-            PresupuestosScreen(navController)
+            //PresupuestosScreen(navController)
         }
 
         composable(Screen.Perfil.route) {
-            // Le pasamos el authViewModel para que pueda llamar a authViewModel.logout()
-            PerfilScreen(navController, authViewModel)
+            //PerfilScreen(navController, authViewModel)
         }
-
-
 
         // Detalle de Grupo
         composable(
@@ -91,7 +111,7 @@ fun AppNavigationController(
             arguments = listOf(navArgument("grupoId") { type = NavType.IntType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("grupoId") ?: 0
-            DetalleGrupoScreen(id, navController)
+            //DetalleGrupoScreen(id, navController)
         }
 
         // Formulario de Gasto (Individual o Grupo)
@@ -104,11 +124,11 @@ fun AppNavigationController(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("grupoId")
             val grupoId = if (id == -1) null else id
-            GastoScreen(grupoId, navController)
+            //GastoScreen(grupoId, navController)
         }
 
         // Formulario de Ingreso y Tarjeta
-        composable(Screen.AgregarIngreso.route) { IngresoScreen(navController) }
-        composable(Screen.AgregarTarjeta.route) { TarjetaScreen(navController) }
+        //composable(Screen.AgregarIngreso.route) { IngresoScreen(navController) }
+        //composable(Screen.AgregarTarjeta.route) { TarjetaScreen(navController) }
     }
 }
