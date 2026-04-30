@@ -21,12 +21,12 @@ import androidx.room.Index
             childColumns = ["idCategoria"],
             onDelete = ForeignKey.RESTRICT
         ),
-        ForeignKey(
-            entity = Grupo::class,
-            parentColumns = ["idGrupo"],
-            childColumns = ["idGrupo"],
-            onDelete = ForeignKey.SET_NULL
-        ),
+//        ForeignKey(
+//            entity = Grupo::class,
+//            parentColumns = ["idGrupo"],
+//            childColumns = ["idGrupo"],
+//            onDelete = ForeignKey.SET_NULL
+//        ),
         ForeignKey(
             entity = Tarjeta::class,
             parentColumns = ["idTarjeta"],
@@ -44,7 +44,7 @@ import androidx.room.Index
 data class Gasto(
     @PrimaryKey(autoGenerate = true)
     val idGasto: Int,
-    val idUsuario: Int,
+    val idUsuarioPaga: Int,
     val idCategoria: Int,
     val idGrupo: Int?,
     val idTarjeta: Int?,

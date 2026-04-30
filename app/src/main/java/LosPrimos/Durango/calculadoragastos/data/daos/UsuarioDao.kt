@@ -17,7 +17,7 @@ interface UsuarioDao {
     @Update
     suspend fun updateUsuario(usuario: Usuario)
 
-    @Query("SELECT * FROM Usuario WHERE correo = :correo AND hashContrasena = :contrasena LIMIT 1")
+    @Query("SELECT * FROM usuarios WHERE correo = :correo AND hashContrasena = :contrasena LIMIT 1")
     suspend fun loginUsuario(correo: String, contrasena: String): Usuario?
 
 }

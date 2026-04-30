@@ -16,10 +16,10 @@ interface GastoDao {
     @Delete
     suspend fun deleteGasto(gasto: Gasto)
 
-    @Query("SELECT * FROM gastos WHERE idUsuario = :idUsuario ORDER BY fecha DESC")
+    @Query("SELECT * FROM gastos WHERE idUsuarioPaga = :idUsuario ORDER BY fecha DESC")
     fun getGastosByUsuario(idUsuario: Int): Flow<List<Gasto>>
 
-    @Query("SELECT SUM(monto) FROM gastos WHERE idUsuario = :idUsuario AND fecha BETWEEN :inicio AND :fin")
+    @Query("SELECT SUM(monto) FROM gastos WHERE idUsuarioPaga = :idUsuario AND fecha BETWEEN :inicio AND :fin")
     fun getTotalGastosUsuarioPeriodo(idUsuario: Int, inicio: Date, fin: Date): Flow<List<Gasto>>
     
     @Query("SELECT * FROM gastos WHERE idGrupo = :idGrupo ORDER BY fecha DESC")

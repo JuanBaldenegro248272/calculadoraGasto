@@ -12,8 +12,8 @@ data class Usuario(
     val nombre: String,
     val correo: String,
     val hashContrasena: String,
-    val fechaNacimiento: Date,
+    val fechaNacimiento: Long,
     val genero: String,
     val fotoPerfil: String,
-    val fechaRegistro: Timestamp
+    val fechaRegistro: Long
 )
