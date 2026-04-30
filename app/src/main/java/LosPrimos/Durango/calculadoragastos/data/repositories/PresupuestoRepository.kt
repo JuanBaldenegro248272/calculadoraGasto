@@ -2,6 +2,7 @@ package LosPrimos.Durango.calculadoragastos.data.repositories
 
 import LosPrimos.Durango.calculadoragastos.data.daos.PresupuestoDao
 import LosPrimos.Durango.calculadoragastos.data.entities.Presupuesto
+import kotlinx.coroutines.flow.Flow
 
 class PresupuestoRepository(private val presupuestoDao: PresupuestoDao){
 
@@ -15,5 +16,9 @@ class PresupuestoRepository(private val presupuestoDao: PresupuestoDao){
 
     suspend fun upatePresupuesto(presupuesto: Presupuesto){
         presupuestoDao.updatePresupuesto(presupuesto)
+    }
+
+    fun obtenerPresupuestos(idUsuario: Int): Flow<List<Presupuesto>> {
+        return presupuestoDao.getPresupuestosPorUsuario(idUsuario)
     }
 }

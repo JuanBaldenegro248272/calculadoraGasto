@@ -14,7 +14,7 @@ class TarjetaRepository(private val tarjetaDao: TarjetaDao){
         tarjetaDao.updateTarjeta(tarjeta)
     }
 
-    suspend fun getAllTarjetas(): Flow<List<Tarjeta?>>{
+     fun getAllTarjetas(): Flow<List<Tarjeta>>{
         return tarjetaDao.getAllTarjetas()
     }
 

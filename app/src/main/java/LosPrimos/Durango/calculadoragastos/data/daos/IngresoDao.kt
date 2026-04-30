@@ -19,6 +19,9 @@ interface IngresoDao {
     @Query("SELECT * FROM ingresos ORDER BY fecha DESC")
     fun getAllIngresos(): Flow<List<Ingreso>>
 
-    @Query("SELECT SUM(monto) FROM ingresos WHERE fecha BETWEEN :inicio AND :fin")
-    fun getTotalIngresosPeriodo(inicio: Date, fin: Date): Flow<List<Ingreso?>>
+    @Query("SELECT SUM(monto) FROM ingresos WHERE idUsuario = :idUsuario AND fecha BETWEEN :inicio AND :fin")
+    fun getSumaIngresosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?>
+
+    @Query("SELECT * FROM ingresos WHERE idUsuario = :idUsuario AND fecha BETWEEN :inicio AND :fin ORDER BY fecha DESC")
+    fun getIngresosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Ingreso>>
 }

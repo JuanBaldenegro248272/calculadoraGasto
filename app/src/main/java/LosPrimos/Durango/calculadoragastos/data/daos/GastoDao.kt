@@ -20,8 +20,10 @@ interface GastoDao {
     fun getGastosByUsuario(idUsuario: Int): Flow<List<Gasto>>
 
     @Query("SELECT SUM(monto) FROM gastos WHERE idUsuarioPaga = :idUsuario AND fecha BETWEEN :inicio AND :fin")
-    fun getTotalGastosUsuarioPeriodo(idUsuario: Int, inicio: Date, fin: Date): Flow<List<Gasto>>
-    
+    fun getSumaGastosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?>
+
+    @Query("SELECT * FROM gastos WHERE idUsuarioPaga = :idUsuario AND fecha BETWEEN :inicio AND :fin ORDER BY fecha DESC")
+    fun getGastosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Gasto>>
     @Query("SELECT * FROM gastos WHERE idGrupo = :idGrupo ORDER BY fecha DESC")
     fun getGastosByGrupo(idGrupo: Int): Flow<List<Gasto>>
 }

@@ -21,7 +21,7 @@ interface TarjetaDao {
     suspend fun deleteTarjeta(tarjeta: Tarjeta)
 
     @Query("SELECT * FROM tarjetas")
-    fun getAllTarjetas(): Flow<List<Tarjeta?>>
+    fun getAllTarjetas(): Flow<List<Tarjeta>>
 
     @Query("SELECT * FROM tarjetas WHERE idTarjeta = :idTarjeta")
     suspend fun getTarjetaById(idTarjeta: Int): Tarjeta?

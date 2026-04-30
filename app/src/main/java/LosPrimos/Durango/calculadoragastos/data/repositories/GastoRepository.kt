@@ -19,15 +19,17 @@ class GastoRepository (private val gastoDao: GastoDao){
         gastoDao.deleteGasto(gasto)
     }
 
-    suspend fun gastosPorUsuario(idUsuario: Int): Flow<List<Gasto>> {
+     fun gastosPorUsuario(idUsuario: Int): Flow<List<Gasto>> {
         return gastoDao.getGastosByUsuario(idUsuario)
     }
 
-    suspend fun gastosPorGrupo(idGrupo: Int): Flow<List<Gasto>>{
+     fun gastosPorGrupo(idGrupo: Int): Flow<List<Gasto>>{
         return gastoDao.getGastosByGrupo(idGrupo)
     }
 
-    suspend fun gastosPorPeriodo(idUsuario: Int, inicio: Date, fin: Date): Flow<List<Gasto>>{
-        return gastoDao.getTotalGastosUsuarioPeriodo(idUsuario, inicio, fin)
-    }
+     fun obtenerSumaGastos(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?> =
+        gastoDao.getSumaGastosPorPeriodo(idUsuario, inicio, fin)
+
+     fun obtenerListaGastos(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Gasto>> =
+        gastoDao.getGastosPorPeriodo(idUsuario, inicio, fin)
 }
