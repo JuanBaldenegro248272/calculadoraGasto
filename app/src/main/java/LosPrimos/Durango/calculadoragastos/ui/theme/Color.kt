@@ -1,22 +1,25 @@
 package LosPrimos.Durango.calculadoragastos.ui.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Main paleta SPENT
+val TealDark = Color(0xFF137A7F)
+val TealLight = Color(0xFF86CECB)
+val MagentaPink = Color(0xFFE12885)
+val DarkGrayText = Color(0xFF373B3E)
+val LightBlueGray = Color(0xFFBEC8D1)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Colores de estructura
+val BackgroundLight = Color(0xFFF5F7F9)
+val SurfaceWhite = Color(0xFFFFFFFF)
+val BackgroundDark = Color(0xFF121212)
+val SurfaceDark = Color(0xFF1E1E1E)
+val ErrorRed = Color(0xFFD32F2F)
 
-
-val AzulApp = Color(0xFF1A3CDB)
-val ColorBarraSuperior = Color(0xFFFFFFFF)
-val GrisTexto = Color(0xFF9E9E9E)
-val GrisBorde = Color(0xFFD4D4D4)
-val FondoBlanco = Color(0xFFFFFFFF)
-val AzulGenero = Color(0xFF4FC3F7)
-val RosaGenero = Color(0xFFF48FB1)
-val ColorLabel = Color(0xFF1C1C1E)
-val GrisPlaceholder = Color(0xFF9E9E9E)
+// Gradiente del fondo
+val MainGradient = Brush.linearGradient(
+    0.45f to TealDark,
+    0.63f to TealLight,
+    0.80f to MagentaPink
+)
