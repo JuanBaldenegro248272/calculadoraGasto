@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 class TarjetaRepository(private val tarjetaDao: TarjetaDao){
 
-    suspend fun insertTarjeta(tarjeta: Tarjeta): Int{
+    suspend fun insertTarjeta(tarjeta: Tarjeta): Long{
         return tarjetaDao.insertTarjeta(tarjeta)
     }
 
@@ -14,8 +14,12 @@ class TarjetaRepository(private val tarjetaDao: TarjetaDao){
         tarjetaDao.updateTarjeta(tarjeta)
     }
 
-     fun getAllTarjetas(): Flow<List<Tarjeta>>{
-        return tarjetaDao.getAllTarjetas()
+    suspend fun deleteTarjeta(tarjeta: Tarjeta){
+        tarjetaDao.deleteTarjeta(tarjeta)
+    }
+
+     fun getAllTarjetasPorUsuario(idUsuario: Int): Flow<List<Tarjeta>>{
+        return tarjetaDao.getTarjetasByUsuario(idUsuario)
     }
 
     suspend fun getTarjetaID(idTarjeta: Int): Tarjeta?{

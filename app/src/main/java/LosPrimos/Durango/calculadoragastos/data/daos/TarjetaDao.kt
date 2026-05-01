@@ -12,16 +12,15 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface TarjetaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertTarjeta(tarjeta: Tarjeta): Int
-
+    suspend fun insertTarjeta(tarjeta: Tarjeta): Long
     @Update
-    suspend fun updateTarjeta(tarjeta: Tarjeta)
+    suspend fun updateTarjeta(tarjeta: Tarjeta): Int
 
     @Delete
-    suspend fun deleteTarjeta(tarjeta: Tarjeta)
+    suspend fun deleteTarjeta(tarjeta: Tarjeta): Int
 
-    @Query("SELECT * FROM tarjetas")
-    fun getAllTarjetas(): Flow<List<Tarjeta>>
+    @Query("SELECT * FROM tarjetas WHERE idUsuario = :idUsuario")
+    fun getTarjetasByUsuario(idUsuario: Int): Flow<List<Tarjeta>>
 
     @Query("SELECT * FROM tarjetas WHERE idTarjeta = :idTarjeta")
     suspend fun getTarjetaById(idTarjeta: Int): Tarjeta?

@@ -7,15 +7,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PresupuestoDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPresupuesto(presupuesto: Presupuesto): Int
-
+    suspend fun insertPresupuesto(presupuesto: Presupuesto): Long
     @Update
-    suspend fun updatePresupuesto(presupuesto: Presupuesto)
-
+    suspend fun updatePresupuesto(presupuesto: Presupuesto): Int
     @Delete
-    suspend fun deletePresupuesto(presupuesto: Presupuesto)
-
+    suspend fun deletePresupuesto(presupuesto: Presupuesto): Int
     @Query("SELECT * FROM presupuestos WHERE idUsuario = :idUsuario")
     fun getPresupuestosPorUsuario(idUsuario: Int): Flow<List<Presupuesto>>
-
 }

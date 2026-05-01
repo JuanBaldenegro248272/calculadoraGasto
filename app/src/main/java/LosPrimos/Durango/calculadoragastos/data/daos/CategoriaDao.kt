@@ -12,14 +12,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface CategoriaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCategoria(categoria: Categoria): Int
+    suspend fun insertCategoria(categoria: Categoria): Long
 
     @Update
-    suspend fun updateCategoria(categoria: Categoria)
+    suspend fun updateCategoria(categoria: Categoria): Int
 
     @Delete
-    suspend fun deleteCategoria(categoria: Categoria)
-
+    suspend fun deleteCategoria(categoria: Categoria): Int
     @Query("SELECT * FROM categorias")
     fun getAllCategorias(): Flow<List<Categoria>>
 

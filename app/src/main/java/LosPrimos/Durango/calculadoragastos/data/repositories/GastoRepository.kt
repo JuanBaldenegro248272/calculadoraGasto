@@ -7,29 +7,29 @@ import java.util.Date
 
 class GastoRepository (private val gastoDao: GastoDao){
 
-    suspend fun insertarGasto(gasto: Gasto): Int{
+    suspend fun insertarGasto(gasto: Gasto): Long{
         return gastoDao.insertGasto(gasto)
     }
 
-    suspend fun updateGasto(gasto: Gasto){
-        gastoDao.updateGasto(gasto)
+    suspend fun updateGasto(gasto: Gasto): Int{
+        return gastoDao.updateGasto(gasto)
     }
 
-    suspend fun deleteGasto(gasto: Gasto){
-        gastoDao.deleteGasto(gasto)
+    suspend fun deleteGasto(gasto: Gasto): Int{
+        return gastoDao.deleteGasto(gasto)
     }
 
-     fun gastosPorUsuario(idUsuario: Int): Flow<List<Gasto>> {
+     fun obtenerListagastosPorUsuario(idUsuario: Int): Flow<List<Gasto>> {
         return gastoDao.getGastosByUsuario(idUsuario)
     }
 
-     fun gastosPorGrupo(idGrupo: Int): Flow<List<Gasto>>{
+     fun obtenergastosPorGrupo(idGrupo: Int): Flow<List<Gasto>>{
         return gastoDao.getGastosByGrupo(idGrupo)
     }
 
-     fun obtenerSumaGastos(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?> =
+     fun obtenerSumaGastosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?> =
         gastoDao.getSumaGastosPorPeriodo(idUsuario, inicio, fin)
 
-     fun obtenerListaGastos(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Gasto>> =
+     fun obtenerListaGastosDeUsuarioPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Gasto>> =
         gastoDao.getGastosPorPeriodo(idUsuario, inicio, fin)
 }

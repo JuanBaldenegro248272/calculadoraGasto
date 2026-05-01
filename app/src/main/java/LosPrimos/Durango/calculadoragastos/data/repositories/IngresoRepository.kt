@@ -7,20 +7,20 @@ import java.util.Date
 
 class IngresoRepository(private val ingresoDao: IngresoDao){
 
-    suspend fun insertIngreso(ingreso: Ingreso): Int{
+    suspend fun insertIngreso(ingreso: Ingreso): Long{
         return ingresoDao.insertIngreso(ingreso)
     }
 
-    suspend fun updateIngreso(ingreso: Ingreso){
-        ingresoDao.updateIngreso(ingreso)
+    suspend fun updateIngreso(ingreso: Ingreso): Int {
+        return ingresoDao.updateIngreso(ingreso)
     }
 
-    suspend fun deleteIngreso(ingreso: Ingreso){
-        ingresoDao.deleteIngreso(ingreso)
+    suspend fun deleteIngreso(ingreso: Ingreso): Int {
+        return ingresoDao.deleteIngreso(ingreso)
     }
 
-     fun obtenerIngresos(): Flow<List<Ingreso>> {
-        return ingresoDao.getAllIngresos()
+     fun obtenerIngresosPorUsuario(idUsuario: Int): Flow<List<Ingreso>> {
+        return ingresoDao.getIngresosByUsuario(idUsuario)
     }
 
      fun obtenerSumaIngresos(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?> =

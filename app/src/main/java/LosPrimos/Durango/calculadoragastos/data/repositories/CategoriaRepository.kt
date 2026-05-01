@@ -6,16 +6,16 @@ import kotlinx.coroutines.flow.Flow
 
 class CategoriaRepository(private val categoriaDao: CategoriaDao) {
 
-    suspend fun insertarCategoria(categoria: Categoria): Int{
+    suspend fun insertarCategoria(categoria: Categoria): Long{
         return categoriaDao.insertCategoria(categoria)
     }
 
-    suspend fun deleteCategoria(categoria: Categoria) {
-        categoriaDao.deleteCategoria(categoria)
+    suspend fun deleteCategoria(categoria: Categoria): Int {
+        return categoriaDao.deleteCategoria(categoria)
     }
 
-    suspend fun updateCategoria(categoria: Categoria){
-        categoriaDao.updateCategoria(categoria)
+    suspend fun updateCategoria(categoria: Categoria): Int{
+        return categoriaDao.updateCategoria(categoria)
     }
 
     suspend fun getCategorias(idCategoria: Int): Categoria?{

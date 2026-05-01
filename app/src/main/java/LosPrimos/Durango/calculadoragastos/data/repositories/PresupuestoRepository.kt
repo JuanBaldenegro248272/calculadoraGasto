@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 class PresupuestoRepository(private val presupuestoDao: PresupuestoDao){
 
-    suspend fun insertarPresupuesto(presupuesto: Presupuesto): Int{
+    suspend fun insertarPresupuesto(presupuesto: Presupuesto): Long{
         return presupuestoDao.insertPresupuesto(presupuesto)
     }
 

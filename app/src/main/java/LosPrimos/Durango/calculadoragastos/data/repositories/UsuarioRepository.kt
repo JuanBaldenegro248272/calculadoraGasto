@@ -15,4 +15,12 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
     suspend fun loginUsuario(correo: String, contrasena: String): Usuario? {
         return usuarioDao.loginUsuario(correo, contrasena)
     }
+
+    suspend fun obtenerUusarioPorId(usuarioId: Int): Usuario? {
+        return usuarioDao.getUsuarioById(usuarioId)
+    }
+
+    suspend fun verificarCorreoExistente(correo: String): Usuario? {
+        return usuarioDao.verificarCorreoExistente(correo)
+    }
 }
