@@ -6,11 +6,7 @@ plugins {
 
 android {
     namespace = "LosPrimos.Durango.calculadoragastos"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "LosPrimos.Durango.calculadoragastos"
@@ -38,6 +34,10 @@ android {
     buildFeatures {
         compose = true
     }
+}
+
+ksp {
+    arg("room.generateKotlin", "true")
 }
 
 dependencies {
