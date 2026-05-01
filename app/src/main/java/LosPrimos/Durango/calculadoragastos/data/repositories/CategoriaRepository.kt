@@ -19,12 +19,10 @@ class CategoriaRepository(private val categoriaDao: CategoriaDao) {
     }
 
     suspend fun getCategorias(idCategoria: Int): Categoria?{
-        return categoriaDao.getCategoriaById(idCategoria)
+        return categoriaDao.getCategoriaById(idCategoria).firstOrNull()
     }
 
      fun getAllCategorias(): Flow<List<Categoria>> {
         return categoriaDao.getAllCategorias()
     }
-
-
 }

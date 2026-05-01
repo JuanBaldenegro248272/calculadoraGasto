@@ -19,9 +19,10 @@ interface CategoriaDao {
 
     @Delete
     suspend fun deleteCategoria(categoria: Categoria): Int
+
     @Query("SELECT * FROM categorias")
     fun getAllCategorias(): Flow<List<Categoria>>
 
-    @Query("SELECT * FROM categorias WHERE idCategoria = :idCategoria")
-    suspend fun getCategoriaById(idCategoria: Int): Categoria?
+    @Query("SELECT * FROM categorias WHERE idCategoria = :idCategoria LIMIT 1")
+    suspend fun getCategoriaById(idCategoria: Int): List<Categoria>
 }

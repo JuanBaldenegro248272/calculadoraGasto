@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 interface TarjetaDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTarjeta(tarjeta: Tarjeta): Long
+
     @Update
     suspend fun updateTarjeta(tarjeta: Tarjeta): Int
 
@@ -22,6 +23,6 @@ interface TarjetaDao {
     @Query("SELECT * FROM tarjetas WHERE idUsuario = :idUsuario")
     fun getTarjetasByUsuario(idUsuario: Int): Flow<List<Tarjeta>>
 
-    @Query("SELECT * FROM tarjetas WHERE idTarjeta = :idTarjeta")
-    suspend fun getTarjetaById(idTarjeta: Int): Tarjeta?
+    @Query("SELECT * FROM tarjetas WHERE idTarjeta = :idTarjeta LIMIT 1")
+    suspend fun getTarjetaById(idTarjeta: Int): List<Tarjeta>
 }

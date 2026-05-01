@@ -23,6 +23,6 @@ class TarjetaRepository(private val tarjetaDao: TarjetaDao){
     }
 
     suspend fun getTarjetaID(idTarjeta: Int): Tarjeta?{
-        return tarjetaDao.getTarjetaById(idTarjeta)
+        return tarjetaDao.getTarjetaById(idTarjeta).firstOrNull()
     }
 }
