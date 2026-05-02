@@ -2,6 +2,7 @@ package LosPrimos.Durango.calculadoragastos.navigation
 
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.ResumeScreen
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.R.attr.defaultValue
 import androidx.compose.foundation.layout.fillMaxSize
@@ -87,7 +88,14 @@ fun AppNavigationController(
 
         // navegacion inferior
         composable(Screen.MenuPrincipal.route) {
-            //ResumeScreen(navController)
+            ResumeScreen(
+                onLogoutClick = {
+                    authViewModel.logout()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(Screen.Grupos.route) {
