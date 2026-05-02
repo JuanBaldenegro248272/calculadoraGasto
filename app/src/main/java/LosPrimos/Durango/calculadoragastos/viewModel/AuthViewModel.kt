@@ -97,8 +97,23 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
     private val _usuarioRecordado = MutableStateFlow<Usuario?>(null)
     val usuarioRecordado: StateFlow<Usuario?> = _usuarioRecordado.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            dataStore.userIdFlow.collect { id ->
+                if (id != null && id != 0) {
+                    val usuario = usuarioRepository.obtenerUusarioPorId(id)
+                    _usuarioRecordado.value = usuario
+                } else {
+                    _usuarioRecordado.value = null
+                }
+            }
+        }
+    }
+
     fun desvincularCuenta() {
-        // Función para el botón "No Eres Hector?"
-        _usuarioRecordado.value = null
+        viewModelScope.launch {
+            dataStore.clearRememberedUser()
+            _usuarioRecordado.value = null
+        }
     }
 }

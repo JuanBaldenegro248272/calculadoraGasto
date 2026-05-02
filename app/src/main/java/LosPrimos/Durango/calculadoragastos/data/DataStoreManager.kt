@@ -20,6 +20,9 @@ class DataStoreManager(private val context: Context) {
     val isLoggedInFlow: Flow<Boolean> = context.dataStore.data
         .map { it[IS_LOGGED_IN] ?: false }
 
+    val userIdFlow: Flow<Int?> = context.dataStore.data
+        .map { it[USER_ID] }
+
     suspend fun saveSession(userId: Int) {
         context.dataStore.edit {
             it[IS_LOGGED_IN] = true
@@ -28,6 +31,12 @@ class DataStoreManager(private val context: Context) {
     }
 
     suspend fun logout() {
+        context.dataStore.edit {
+            it[IS_LOGGED_IN] = false
+        }
+    }
+
+    suspend fun clearRememberedUser() {
         context.dataStore.edit {
             it.clear()
         }
