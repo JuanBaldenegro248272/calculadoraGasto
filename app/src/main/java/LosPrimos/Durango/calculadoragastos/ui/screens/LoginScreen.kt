@@ -59,7 +59,7 @@ fun LoginScreen(
         }
     }
 
-    AuthBackground {
+    AuthBackground(isRememberedUser = usuarioRecordado != null) {
         Column(
             modifier = Modifier
                 .fillMaxSize()

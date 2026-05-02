@@ -59,6 +59,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 
 
 private const val EDAD_MINIMA = 15
@@ -74,9 +75,11 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
     var repeatPassword  by remember { mutableStateOf("") }
 
     var fechaNacimientoMs by remember { mutableStateOf<Long?>(null) }
-    val fechaNacimientoTexto = fechaNacimientoMs
-        ?.let { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it)) }
-        ?: ""
+    val fechaNacimientoTexto = fechaNacimientoMs?.let {
+        val formateador = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        formateador.timeZone = TimeZone.getTimeZone("UTC")
+        formateador.format(Date(it))
+    } ?: ""
 
     var mostrarDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(

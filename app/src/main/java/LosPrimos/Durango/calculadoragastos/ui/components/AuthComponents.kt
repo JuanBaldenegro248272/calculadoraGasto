@@ -1,5 +1,6 @@
 package LosPrimos.Durango.calculadoragastos.ui.components
 
+import LosPrimos.Durango.calculadoragastos.ui.theme.DarkGrayText
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
 import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
+import LosPrimos.Durango.calculadoragastos.ui.theme.MainGradient
 
 
 val ColorTeal = TealDark
@@ -26,11 +28,20 @@ val ColorPink = MagentaPink
 val ColorBackground = Color(0xFF4A555C)
 
 @Composable
-fun AuthBackground(content: @Composable () -> Unit) {
+fun AuthBackground(
+    isRememberedUser: Boolean = false,
+    content: @Composable () -> Unit
+) {
+    val backgroundModifier = if (isRememberedUser) {
+        Modifier.background(MainGradient)
+    } else {
+        Modifier.background(ColorBackground)
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(ColorBackground)
+            .then(backgroundModifier)
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
