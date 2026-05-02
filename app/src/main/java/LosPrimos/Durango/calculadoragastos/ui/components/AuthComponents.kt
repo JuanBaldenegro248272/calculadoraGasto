@@ -17,9 +17,12 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
+import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
 
-val ColorTeal = Color(0xFF147A7B)
-val ColorPink = Color(0xFFE91E63)
+
+val ColorTeal = TealDark
+val ColorPink = MagentaPink
 val ColorBackground = Color(0xFF4A555C)
 
 @Composable

@@ -44,6 +44,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -195,7 +196,8 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                         color = Color.Black,
                         modifier = Modifier.padding(bottom = 4.dp)
                     )
-                    Box(modifier = Modifier.clickable { mostrarDatePicker = true }) {
+
+                    Box(modifier = Modifier.fillMaxWidth()) {
                         SpentTextField(
                             value = fechaNacimientoTexto,
                             onValueChange = {},
@@ -203,14 +205,21 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
                             placeholder = "Seleccionar fecha",
                             trailingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Check, // O puedes usar Icons.Default.DateRange
+                                    imageVector = Icons.Default.DateRange,
                                     contentDescription = "Abrir calendario",
                                     tint = Color.Gray
                                 )
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
+
+                        Box(
+                            modifier = Modifier
+                                .matchParentSize()
+                                .clickable { mostrarDatePicker = true }
+                        )
                     }
+
                     AnimatedVisibility(visible = errorFecha != null) {
                         Text(
                             text = errorFecha ?: "",
