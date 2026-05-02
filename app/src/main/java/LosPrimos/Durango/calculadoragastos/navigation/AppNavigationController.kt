@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.navigation
 
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.R.attr.defaultValue
 import androidx.compose.foundation.layout.fillMaxSize
@@ -78,10 +79,10 @@ fun AppNavigationController(
 
 
         composable(Screen.Register.route) {
-            // RegisterScreen(
-            //     viewModel = authViewModel,
-            //     onNavigateBack = { navController.popBackStack() }
-            // )
+            RegisterScreen(
+                navController = navController,
+                viewModel = authViewModel
+            )
         }
 
         // navegacion inferior

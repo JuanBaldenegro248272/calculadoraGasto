@@ -14,6 +14,6 @@ data class Usuario(
     val hashContrasena: String,
     val fechaNacimiento: Long,
     val genero: String,
-    val fotoPerfil: String,
+    val fotoPerfil: String?,
     val fechaRegistro: Long
 )

@@ -51,11 +51,15 @@ fun SpentTextField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     isPassword: Boolean = false,
-    trailingIcon: @Composable (() -> Unit)? = null
+    trailingIcon: @Composable (() -> Unit)? = null,
+    readOnly: Boolean = false,
+    modifier: Modifier = Modifier.fillMaxWidth()
+
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
+        readOnly = readOnly,
         placeholder = { Text(placeholder, color = Color.Gray) },
         trailingIcon = trailingIcon,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
@@ -64,7 +68,7 @@ fun SpentTextField(
             focusedIndicatorColor = ColorTeal,
             unfocusedIndicatorColor = Color.LightGray
         ),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         singleLine = true
     )
 }

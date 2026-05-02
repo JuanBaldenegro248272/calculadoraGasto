@@ -58,6 +58,37 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
         }
     }
 
+    fun register(usuario: Usuario) {
+        if (usuario.correo.isBlank() || usuario.hashContrasena.isBlank() || usuario.nombre.isBlank()) {
+            _authState.value = AuthState.Error("Por favor llena todos los campos obligatorios")
+            return
+        }
+
+        viewModelScope.launch {
+            _authState.value = AuthState.Loading
+
+            try {
+                val usuarioExistente = usuarioRepository.verificarCorreoExistente(usuario.correo)
+
+                if (usuarioExistente != null) {
+                    _authState.value = AuthState.Error("Este correo electrónico ya está en uso")
+                    return@launch // Detenemos la ejecución aquí
+                }
+                val nuevoId = usuarioRepository.insertarUsuario(usuario)
+
+                if (nuevoId > 0) {
+                    dataStore.saveSession(nuevoId.toInt())
+                    _authState.value = AuthState.Success(nuevoId.toInt())
+                } else {
+                    _authState.value = AuthState.Error("Ocurrió un error al crear la cuenta")
+                }
+
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Error: ${e.message}")
+            }
+        }
+    }
+
     fun resetState() {
         _authState.value = AuthState.Idle
     }
