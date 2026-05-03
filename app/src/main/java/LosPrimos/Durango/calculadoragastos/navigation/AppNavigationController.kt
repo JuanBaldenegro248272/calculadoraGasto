@@ -3,6 +3,7 @@ package LosPrimos.Durango.calculadoragastos.navigation
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.ResumeScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoScreen
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.R.attr.defaultValue
 import androidx.compose.foundation.layout.fillMaxSize
@@ -133,7 +134,7 @@ fun AppNavigationController(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("grupoId")
             val grupoId = if (id == -1) null else id
-            //GastoScreen(grupoId, navController)
+            AgregarGastoScreen(onBack = { navController.popBackStack() })
         }
 
         // Formulario de Ingreso y Tarjeta
