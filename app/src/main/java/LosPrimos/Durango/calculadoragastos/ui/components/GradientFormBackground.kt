@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -42,12 +43,13 @@ fun GradientFormBackground(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(108.dp)
+                    .height(100.dp)
                     .padding(horizontal = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -71,7 +73,6 @@ fun GradientFormBackground(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset(y = 8.dp)
                     .padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
                 color = Color.White,
                 shape = RoundedCornerShape(34.dp),

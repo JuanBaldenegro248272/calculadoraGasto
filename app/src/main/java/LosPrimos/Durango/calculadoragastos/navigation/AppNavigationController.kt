@@ -4,6 +4,7 @@ import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.ResumeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.R.attr.defaultValue
 import androidx.compose.foundation.layout.fillMaxSize
@@ -137,8 +138,11 @@ fun AppNavigationController(
             AgregarGastoScreen(onBack = { navController.popBackStack() })
         }
 
-        // Formulario de Ingreso y Tarjeta
-        //composable(Screen.AgregarIngreso.route) { IngresoScreen(navController) }
+        composable(Screen.AgregarIngreso.route) {
+            AgregarIngresoScreen(onBack = { navController.popBackStack() })
+        }
+
+        // Formulario de Tarjeta
         //composable(Screen.AgregarTarjeta.route) { TarjetaScreen(navController) }
     }
 }
