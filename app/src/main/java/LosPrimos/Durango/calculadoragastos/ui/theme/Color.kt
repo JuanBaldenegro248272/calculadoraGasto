@@ -18,8 +18,17 @@ val SurfaceDark = Color(0xFF1E1E1E)
 val ErrorRed = Color(0xFFD32F2F)
 
 // Gradiente del fondo
-val MainGradient = Brush.linearGradient(
-    0.45f to TealDark,
-    0.63f to TealLight,
-    0.80f to MagentaPink
+//val MainGradient = Brush.linearGradient(
+//    0.45f to TealDark,
+//    0.63f to TealLight,
+//    0.80f to MagentaPink
+//)
+val MainGradient = Brush.horizontalGradient(
+    colors = listOf(
+        TealDark,
+        TealLight,
+        TealLight,
+        MagentaPink
+
+    )
 )

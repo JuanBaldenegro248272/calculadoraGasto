@@ -1,12 +1,15 @@
 package LosPrimos.Durango.calculadoragastos.navigation
 
+import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.ResumeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
+
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
-import android.R.attr.defaultValue
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +30,7 @@ sealed class Screen(val route: String) {
     object Graficas : Screen("graficas")
     object Presupuestos : Screen("presupuestos")
     object Grupos : Screen("grupos")
+    object Home : Screen("home")
 
     object DetalleGrupo : Screen("detalleGrupo/{grupoId}") {
         fun createRoute(grupoId: Int) = "detalleGrupo/$grupoId"
@@ -48,6 +52,7 @@ sealed class Screen(val route: String) {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigationController(
     navController: NavHostController,
@@ -57,9 +62,8 @@ fun AppNavigationController(
 
     NavHost(
         navController = navController,
-        startDestination = if (loggedIn) Screen.MenuPrincipal.route else Screen.Login.route
+        startDestination = if (loggedIn) Screen.Home.route else Screen.Login.route
     ) {
-
 
         composable(Screen.Login.route) {
             LoginScreen(
@@ -68,29 +72,26 @@ fun AppNavigationController(
                     navController.navigate(Screen.Register.route)
                 },
                 onLoginSuccess = {
-                    navController.navigate(Screen.MenuPrincipal.route) {
+                    navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
             )
         }
 
-        composable(Screen.MenuPrincipal.route) {
-            Text("¡Bienvenido al Menú Principal!", modifier = Modifier.fillMaxSize())
-        }
-
-
-
         composable(Screen.Register.route) {
-            RegisterScreen(
-                navController = navController,
-                viewModel = authViewModel
-            )
+            RegisterScreen(navController = navController, viewModel = authViewModel)
         }
 
         // navegacion inferior
-        composable(Screen.MenuPrincipal.route) {
-            ResumeScreen(
+        composable(Screen.Home.route) {
+            HomeScreen(
+                onNavigate = { rutaDestino ->
+                    navController.navigate(rutaDestino) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
                 onLogoutClick = {
                     authViewModel.logout()
                     navController.navigate(Screen.Login.route) {
@@ -98,6 +99,30 @@ fun AppNavigationController(
                     }
                 }
             )
+        }
+
+        composable(Screen.Grupos.route) {
+            // GruposScreen(navController)
+        }
+
+        composable(Screen.Graficas.route) {
+            // GraficasScreen(navController)
+        }
+
+        composable(Screen.Presupuestos.route) {
+            // PresupuestosScreen(navController)
+        }
+
+        composable(Screen.Perfil.route) {
+            // exactameente llo mismo que esta arriba
+            // PerfilScreen(
+            //     onLogoutClick = {
+            //         authViewModel.logout()
+            //         navController.navigate(Screen.Login.route) {
+            //             popUpTo(0) { inclusive = true }
+            //         }
+            //     }
+            // )
         }
 
         composable(Screen.Grupos.route) {
