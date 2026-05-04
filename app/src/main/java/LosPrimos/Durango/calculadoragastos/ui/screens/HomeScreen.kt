@@ -1,5 +1,6 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
+import LosPrimos.Durango.calculadoragastos.navigation.Screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -51,7 +52,8 @@ fun HomeScreen(onNavigate: (String) -> Unit,
                         modifier = Modifier.padding(bottom = 16.dp)
                     ) {
                         ExtendedFloatingActionButton(
-                            onClick = { showFabMenu = false  },
+                            onClick = { showFabMenu = false
+                                onNavigate(Screen.AgregarIngreso.route)},
                             containerColor = TealDark,
                             contentColor = Color.White,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -62,7 +64,8 @@ fun HomeScreen(onNavigate: (String) -> Unit,
                         }
 
                         ExtendedFloatingActionButton(
-                            onClick = { showFabMenu = false  },
+                            onClick = { showFabMenu = false
+                                onNavigate(Screen.AgregarGasto.createRoute())}, //es create route porque no lleva id de algun grupo
                             containerColor = MagentaPink,
                             contentColor = Color.White
                         ) {
