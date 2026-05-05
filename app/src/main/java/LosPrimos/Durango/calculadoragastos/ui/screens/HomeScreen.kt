@@ -24,7 +24,6 @@ import LosPrimos.Durango.calculadoragastos.ui.components.*
 
 @Composable
 fun HomeScreen(onNavigate: (String) -> Unit,
-               onLogoutClick: () -> Unit
 ) {
     var isGastosSelected by remember { mutableStateOf(true) }
     var mesSeleccionado by remember { mutableStateOf("Abril") }
@@ -37,7 +36,7 @@ fun HomeScreen(onNavigate: (String) -> Unit,
         bottomBar = {
             SpentBottomNavigation(
                 currentRoute = "home",
-                onNavigate = {  }
+                onNavigate = { onNavigate(it) }
             )
         },
         floatingActionButton = {
@@ -114,13 +113,6 @@ fun HomeScreen(onNavigate: (String) -> Unit,
                     ) {
                         Text("Inicio", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
 
-                        IconButton(onClick = onLogoutClick) {
-                            Icon(
-                                imageVector = Icons.Default.Logout, //quitar este boton despues, namas ta de prueba mientras hacemos el perfil
-                                contentDescription = "LogOut",
-                                tint = Color.White
-                            )
-                        }
                     }
                 }
 
