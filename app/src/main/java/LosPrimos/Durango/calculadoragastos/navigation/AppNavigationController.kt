@@ -6,6 +6,7 @@ import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.ResumeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.GruposScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.PerfilScreen
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
@@ -98,7 +99,14 @@ fun AppNavigationController(
 
 
         composable(Screen.Grupos.route) {
-            //GruposScreen(navController)
+            GruposScreen(
+                onNavigate = { ruta ->
+                    navController.navigate(ruta) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
 
         composable(Screen.Graficas.route) {
