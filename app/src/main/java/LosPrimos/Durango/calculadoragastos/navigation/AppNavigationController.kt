@@ -1,5 +1,6 @@
 package LosPrimos.Durango.calculadoragastos.navigation
 
+import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
 import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
@@ -21,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,10 +71,12 @@ fun AppNavigationController(
     val context = LocalContext.current
     val database = SpentDatabase.getDatabase(context)
     val gastoRepository = GastoRepository(database.gastoDao())
+    val dataStoreManager = remember { DataStoreManager(context) }
 
 
     val appViewModelFactory = AppViewModelFactory(
-        gastoRepository = gastoRepository
+        gastoRepository = gastoRepository,
+        dataStore = dataStoreManager
     )
 
     val gastoViewModel: GastoViewModel = viewModel(

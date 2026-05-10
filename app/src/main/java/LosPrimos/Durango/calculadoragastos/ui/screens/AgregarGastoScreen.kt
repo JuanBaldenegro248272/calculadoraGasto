@@ -33,6 +33,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +54,7 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel) {
+    val usuarioActualId by gastoviewModel.usuarioActualId.collectAsState()
     val formato = DateTimeFormatter.ofPattern("dd / MM / yyyy")
     var monto by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
@@ -244,21 +246,28 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel) {
 
             Button(
                 onClick = {
+                    if (usuarioActualId == null || usuarioActualId == 0) {
+                        return@Button
+                    }
+
+                    val montoDouble = monto.toDoubleOrNull()
+                    if (montoDouble == null) {
+                        return@Button
+                    }
+
                     val localDate = LocalDate.parse(fecha, formato)
                     val fechaLong = localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
 
                     val nuevoGasto = Gasto(
                         idGasto = 0,
-                        idUsuarioPaga = 1,
+                        idUsuarioPaga = usuarioActualId!!,
                         idCategoria = null,
                         idGrupo = null,
                         idTarjeta = null,
-                        monto = monto.toDouble(),
+                        monto = monto.toDoubleOrNull() ?: 0.0, // Ver nota extra abajo
                         descripcion = descripcion,
                         fecha = fechaLong,
-                        tipoPago = if (metodoPago == "Efectivo"){
-                            TipoPago.EFECTIVO
-                        }else{ TipoPago.TARJETA},
+                        tipoPago = if (metodoPago == "Efectivo") TipoPago.EFECTIVO else TipoPago.TARJETA,
                         lugar = "",
                         fotoRecibo = null
                     )
