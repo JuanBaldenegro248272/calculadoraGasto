@@ -1,5 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.navigation
 
+import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
+import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
@@ -8,8 +10,10 @@ import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GraficasScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GruposScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.PerfilScreen
+import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -60,6 +66,18 @@ fun AppNavigationController(
     authViewModel: AuthViewModel
 ) {
     val loggedIn by authViewModel.isLoggedIn.collectAsState()
+    val context = LocalContext.current
+    val database = SpentDatabase.getDatabase(context)
+    val gastoRepository = GastoRepository(database.gastoDao())
+
+
+    val appViewModelFactory = AppViewModelFactory(
+        gastoRepository = gastoRepository
+    )
+
+    val gastoViewModel: GastoViewModel = viewModel(
+        factory = appViewModelFactory
+    )
 
     NavHost(
         navController = navController,
@@ -161,7 +179,9 @@ fun AppNavigationController(
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("grupoId")
             val grupoId = if (id == -1) null else id
-            AgregarGastoScreen(onBack = { navController.popBackStack() })
+            AgregarGastoScreen(onBack = { navController.popBackStack() },
+                                gastoviewModel = gastoViewModel
+                )
         }
 
         composable(Screen.AgregarIngreso.route) {

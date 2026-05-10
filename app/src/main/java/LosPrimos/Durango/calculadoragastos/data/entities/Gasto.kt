@@ -45,7 +45,7 @@ data class Gasto(
     @PrimaryKey(autoGenerate = true)
     val idGasto: Int,
     val idUsuarioPaga: Int,
-    val idCategoria: Int,
+    val idCategoria: Int?,
     val idGrupo: Int?,
     val idTarjeta: Int?,
     val monto: Double,

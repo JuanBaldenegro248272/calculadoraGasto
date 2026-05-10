@@ -24,6 +24,12 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
         false
     )
 
+    val userId = dataStore.userIdFlow.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        null
+    )
+
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 

@@ -1,8 +1,11 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
+import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
+import LosPrimos.Durango.calculadoragastos.data.enums.TipoPago
 import LosPrimos.Durango.calculadoragastos.ui.components.GradientFormBackground
 import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
+import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -44,16 +47,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AgregarGastoScreen(onBack: () -> Unit) {
+fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel) {
     val formato = DateTimeFormatter.ofPattern("dd / MM / yyyy")
     var monto by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var metodoPago by remember { mutableStateOf("Efectivo") }
-    var fecha by remember { mutableStateOf(LocalDate.now().format(formato)) }
+    var fecha by remember { mutableStateOf(LocalDate.now().format(formato))
+    }
 
     GradientFormBackground(
         title = "Nuevo Gasto",
@@ -168,13 +173,13 @@ fun AgregarGastoScreen(onBack: () -> Unit) {
                 BotonPago(
                     texto = "Tarjeta",
                     seleccionado = metodoPago == "Tarjeta",
-                    alDarClick = { metodoPago = "Tarjeta" },
+                    onClick = { metodoPago = "Tarjeta" },
                     modifier = Modifier.weight(1f)
                 )
                 BotonPago(
                     texto = "Efectivo",
                     seleccionado = metodoPago == "Efectivo",
-                    alDarClick = { metodoPago = "Efectivo" },
+                    onClick = { metodoPago = "Efectivo" },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -219,7 +224,8 @@ fun AgregarGastoScreen(onBack: () -> Unit) {
             )
             BotonAccion(
                 texto = "Capturar Ubicacion",
-                icono = Icons.Outlined.LocationOn
+                icono = Icons.Outlined.LocationOn,
+                onClick = {}
             )
 
             Text(
@@ -230,13 +236,35 @@ fun AgregarGastoScreen(onBack: () -> Unit) {
             )
             BotonAccion(
                 texto = "Subir Foto",
-                icono = Icons.Outlined.FileUpload
+                icono = Icons.Outlined.FileUpload,
+                onClick = {}
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             Button(
-                onClick = {},
+                onClick = {
+                    val localDate = LocalDate.parse(fecha, formato)
+                    val fechaLong = localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+
+                    val nuevoGasto = Gasto(
+                        idGasto = 0,
+                        idUsuarioPaga = 1,
+                        idCategoria = null,
+                        idGrupo = null,
+                        idTarjeta = null,
+                        monto = monto.toDouble(),
+                        descripcion = descripcion,
+                        fecha = fechaLong,
+                        tipoPago = if (metodoPago == "Efectivo"){
+                            TipoPago.EFECTIVO
+                        }else{ TipoPago.TARJETA},
+                        lugar = "",
+                        fotoRecibo = null
+                    )
+                    gastoviewModel.insertarGasto(nuevoGasto)
+                    onBack()
+                },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .width(190.dp)
@@ -262,11 +290,11 @@ fun AgregarGastoScreen(onBack: () -> Unit) {
 private fun BotonPago(
     texto: String,
     seleccionado: Boolean,
-    alDarClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Button(
-        onClick = alDarClick,
+        onClick = onClick,
         modifier = modifier.height(40.dp),
         shape = RoundedCornerShape(9.dp),
         border = if (seleccionado) null else BorderStroke(1.dp, Color(0xFFC8C2D2)),
@@ -282,10 +310,11 @@ private fun BotonPago(
 @Composable
 private fun BotonAccion(
     texto: String,
-    icono: ImageVector
+    icono: ImageVector,
+    onClick: () -> Unit
 ) {
     Button(
-        onClick = {},
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .height(42.dp)
@@ -308,11 +337,4 @@ private fun BotonAccion(
             Text(text = texto, fontSize = 14.sp)
         }
     }
-}
-
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AgregarGastoScreenPreview() {
-    AgregarGastoScreen(onBack = {})
 }
