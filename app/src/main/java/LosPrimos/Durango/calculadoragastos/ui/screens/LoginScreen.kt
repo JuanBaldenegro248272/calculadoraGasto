@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.Icon
@@ -161,15 +162,14 @@ fun LoginScreen(
                         Icon(Icons.Outlined.Lock, contentDescription = null, tint = Color.Gray)
                     }
                 )
-
-                // Botón biométrico — solo visible si el dispositivo lo soporta
+                
                 if (Helper.isDisponible()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.clickable { Helper.mostrarPrompt() }
                     ) {
                         Icon(
-                            Icons.Filled.Face,
+                            Icons.Default.Fingerprint,
                             contentDescription = "Huella",
                             tint = ColorPink,
                             modifier = Modifier.size(32.dp)
