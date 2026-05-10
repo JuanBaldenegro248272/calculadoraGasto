@@ -3,6 +3,7 @@ package LosPrimos.Durango.calculadoragastos
 import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
 import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
+import LosPrimos.Durango.calculadoragastos.data.repositories.IngresoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import LosPrimos.Durango.calculadoragastos.navigation.AppNavigationController
 import android.os.Bundle
@@ -32,11 +33,13 @@ class MainActivity : AppCompatActivity() {
         val usuarioRepository = UsuarioRepository(database.usuarioDao())
         val gastoRepository = GastoRepository(database.gastoDao())
         val dataStoreManager = DataStoreManager(applicationContext)
+        val ingresoRepository = IngresoRepository(database.ingresoDao())
 
         val appViewModelFactory = AppViewModelFactory(
             gastoRepository = gastoRepository,
             usuarioRepository = usuarioRepository,
             dataStoreManager = dataStoreManager,
+            ingresoRepository = ingresoRepository
         )
 
         setContent {

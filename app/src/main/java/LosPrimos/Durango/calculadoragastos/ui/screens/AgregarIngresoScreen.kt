@@ -1,8 +1,10 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
+import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
 import LosPrimos.Durango.calculadoragastos.ui.components.GradientFormBackground
 import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
+import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -30,6 +32,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,15 +42,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AgregarIngresoScreen(onBack: () -> Unit) {
+fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel) {
+    val usuarioActualId = ingresoViewModel.usuarioActualId.collectAsState()
     val formato = DateTimeFormatter.ofPattern("dd / MM / yyyy")
     var monto by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
@@ -253,7 +257,26 @@ fun AgregarIngresoScreen(onBack: () -> Unit) {
             Spacer(modifier = Modifier.height(40.dp))
 
             Button(
-                onClick = {},
+
+                onClick = {
+                    if (usuarioActualId.value == null){
+                        return@Button
+                    }
+
+                    val localDate = LocalDate.parse(fecha, formato)
+                    val fechaLong = localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+                    val nuevoIngreso = Ingreso(
+                        idIngreso = 0,
+                        monto = monto.toDouble(),
+                        fecha = fechaLong,
+                        descripcion = descripcion,
+                        idCategoria = null,
+                        idUsuario = usuarioActualId.value
+                    )
+
+                    ingresoViewModel.insertarIngreso(nuevoIngreso)
+                    onBack()
+                },
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .width(190.dp)
@@ -275,9 +298,3 @@ fun AgregarIngresoScreen(onBack: () -> Unit) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AgregarIngresoScreenPreview() {
-    AgregarIngresoScreen(onBack = {})
-}

@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import java.util.Date
 
 @Entity(
     tableName = "ingresos",
@@ -24,6 +23,6 @@ data class Ingreso(
     val monto: Double,
     val fecha: Long,
     val descripcion: String?,
-    val idCategoria: Int,
-    val idUsuario: Int
+    val idCategoria: Int?,
+    val idUsuario: Int?
 )

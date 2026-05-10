@@ -18,7 +18,7 @@ import androidx.room.RoomDatabase
     Gasto::class,
     Ingreso::class,
     Categoria::class,
-    Tarjeta::class], version = 2, exportSchema = false)
+    Tarjeta::class], version = 3, exportSchema = false)
 abstract class SpentDatabase : RoomDatabase(){
     abstract fun usuarioDao(): UsuarioDao
     abstract fun gastoDao(): GastoDao

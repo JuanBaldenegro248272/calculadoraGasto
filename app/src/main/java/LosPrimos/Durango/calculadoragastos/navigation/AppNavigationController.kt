@@ -17,6 +17,7 @@ import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PerfilViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -82,6 +83,7 @@ fun AppNavigationController(
 
 
     val gastoViewModel: GastoViewModel = viewModel(factory = factory)
+    val ingresoViewModel: IngresoViewModel = viewModel(factory = factory)
 
     NavHost(
         navController = navController,
@@ -199,7 +201,8 @@ fun AppNavigationController(
         }
 
         composable(Screen.AgregarIngreso.route) {
-            AgregarIngresoScreen(onBack = { navController.popBackStack() })
+            AgregarIngresoScreen(onBack = { navController.popBackStack() },
+                ingresoViewModel)
         }
 
         // Formulario de Tarjeta
