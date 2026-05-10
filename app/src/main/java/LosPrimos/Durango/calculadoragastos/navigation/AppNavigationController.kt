@@ -3,9 +3,9 @@ package LosPrimos.Durango.calculadoragastos.navigation
 import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
-import LosPrimos.Durango.calculadoragastos.ui.screens.ResumeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.GraficasScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GruposScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.PerfilScreen
 
@@ -27,7 +27,6 @@ import androidx.navigation.navArgument
 sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Register : Screen("register")
-    object MenuPrincipal : Screen("menuPrincipal")
     object Perfil : Screen("perfil")
     object Graficas : Screen("graficas")
     object Presupuestos : Screen("presupuestos")
@@ -110,12 +109,19 @@ fun AppNavigationController(
         }
 
         composable(Screen.Graficas.route) {
-            //GraficasScreen(navController)
+            GraficasScreen(
+                onNavigate = { rutaDestino ->
+                    navController.navigate(rutaDestino) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
 
-        composable(Screen.Presupuestos.route) {
-            //PresupuestosScreen(navController)
-        }
+//        composable(Screen.Presupuestos.route) {
+//            //PresupuestosScreen(navController)
+//        }
 
 
 

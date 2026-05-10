@@ -32,7 +32,7 @@ fun SpentBottomNavigation(
 ) {
     val items = listOf(
         BottomNavItem("Inicio", "home", Icons.Default.Home),
-        BottomNavItem("Presupuesto", "presupuesto", Icons.Default.AccountBalanceWallet),
+        BottomNavItem("Presupuesto", "presupuestos", Icons.Default.AccountBalanceWallet),
         BottomNavItem("Grupos", "grupos", Icons.Default.Group),
         BottomNavItem("Gráficas", "graficas", Icons.Default.PieChart),
         BottomNavItem("Perfil", "perfil", Icons.Default.Person)

@@ -107,7 +107,7 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
 
     LaunchedEffect(authState) {
         if (authState is AuthState.Success) {
-            navController.navigate(Screen.MenuPrincipal.route) {
+            navController.navigate(Screen.Home.route) {
                 popUpTo(Screen.Login.route) { inclusive = true }
             }
         }
