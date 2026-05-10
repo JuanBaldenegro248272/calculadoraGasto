@@ -130,10 +130,13 @@ fun HomeScreen(
                     }
                 }
 
+                val totalIngresos = ingresos.sumOf { it.monto }
+                val totalGastos = gastos.sumOf { it.monto }
+
                 BalanceSummarySection(
-                    ingresos = 85000.0,
-                    gastos = 2500.0,
-                    balance = 82500.0,
+                    ingresos = totalIngresos,
+                    gastos = totalGastos,
+                    balance = totalIngresos - totalGastos,
                     presupuestoUtilizado = 0.716f,
                     textoPresupuesto = "71.6% del presupuesto utilizado ($2,000 / $10,000)"
                 )
