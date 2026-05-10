@@ -2,6 +2,7 @@ package LosPrimos.Durango.calculadoragastos.data.repositories
 
 import LosPrimos.Durango.calculadoragastos.data.daos.UsuarioDao
 import LosPrimos.Durango.calculadoragastos.data.entities.Usuario
+import kotlinx.coroutines.flow.Flow
 
 class UsuarioRepository(private val usuarioDao: UsuarioDao) {
     suspend fun insertarUsuario(usuario: Usuario): Long {
@@ -16,9 +17,10 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
         return usuarioDao.loginUsuario(correo, contrasena)
     }
 
-    suspend fun obtenerUusarioPorId(usuarioId: Int): Usuario? {
+    fun obtenerUsuarioPorId(usuarioId: Int): Flow<Usuario?> {
         return usuarioDao.getUsuarioById(usuarioId)
     }
+
 
     suspend fun verificarCorreoExistente(correo: String): Usuario? {
         return usuarioDao.verificarCorreoExistente(correo)

@@ -19,7 +19,7 @@ interface UsuarioDao {
     suspend fun loginUsuario(correo: String, contrasena: String): Usuario?
 
     @Query("SELECT * FROM usuarios WHERE idUsuario = :id LIMIT 1")
-    suspend fun getUsuarioById(id: Int): Usuario?
+    fun getUsuarioById(id: Int): Flow<Usuario?>
 
     @Query("SELECT * FROM usuarios WHERE correo = :correo LIMIT 1")
     suspend fun verificarCorreoExistente(correo: String): Usuario?

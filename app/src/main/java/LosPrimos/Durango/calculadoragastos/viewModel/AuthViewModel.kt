@@ -78,7 +78,7 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
 
                 if (usuarioExistente != null) {
                     _authState.value = AuthState.Error("Este correo electrónico ya está en uso")
-                    return@launch // Detenemos la ejecución aquí
+                    return@launch
                 }
                 val nuevoId = usuarioRepository.insertarUsuario(usuario)
 
@@ -100,26 +100,18 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
     }
 
 
-    private val _usuarioRecordado = MutableStateFlow<Usuario?>(null)
-    val usuarioRecordado: StateFlow<Usuario?> = _usuarioRecordado.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            dataStore.userIdFlow.collect { id ->
-                if (id != null && id != 0) {
-                    val usuario = usuarioRepository.obtenerUusarioPorId(id)
-                    _usuarioRecordado.value = usuario
-                } else {
-                    _usuarioRecordado.value = null
-                }
+    val usuarioRecordado: StateFlow<Usuario?> = dataStore.userIdFlow
+        .flatMapLatest { id ->
+            if (id != null && id != 0) {
+                usuarioRepository.obtenerUsuarioPorId(id)
+            } else {
+                flowOf(null)
             }
         }
-    }
-
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
     fun desvincularCuenta() {
         viewModelScope.launch {
             dataStore.clearRememberedUser()
-            _usuarioRecordado.value = null
         }
     }
 }

@@ -3,6 +3,7 @@ package LosPrimos.Durango.calculadoragastos.navigation
 import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
 import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
+import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
@@ -15,15 +16,15 @@ import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.PerfilViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -65,7 +66,9 @@ sealed class Screen(val route: String) {
 @Composable
 fun AppNavigationController(
     navController: NavHostController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    factory: AppViewModelFactory
+
 ) {
     val loggedIn by authViewModel.isLoggedIn.collectAsState()
     val context = LocalContext.current
@@ -74,14 +77,10 @@ fun AppNavigationController(
     val dataStoreManager = remember { DataStoreManager(context) }
 
 
-    val appViewModelFactory = AppViewModelFactory(
-        gastoRepository = gastoRepository,
-        dataStore = dataStoreManager
-    )
 
-    val gastoViewModel: GastoViewModel = viewModel(
-        factory = appViewModelFactory
-    )
+
+
+    val gastoViewModel: GastoViewModel = viewModel(factory = factory)
 
     NavHost(
         navController = navController,
@@ -148,7 +147,9 @@ fun AppNavigationController(
 
 
         composable(Screen.Perfil.route) {
+            val perfilViewModel: PerfilViewModel = viewModel(factory = factory)
             PerfilScreen(
+
                 onNavigate = { ruta ->
                     navController.navigate(ruta) {
                         launchSingleTop = true
@@ -160,7 +161,8 @@ fun AppNavigationController(
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
-                }
+                },
+                viewModel = perfilViewModel
             )
         }
 

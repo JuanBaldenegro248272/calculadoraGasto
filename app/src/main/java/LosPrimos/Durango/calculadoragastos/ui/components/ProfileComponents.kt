@@ -17,8 +17,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
+import android.annotation.SuppressLint
+import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Edit
-
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 @Composable
 fun ProfileTopBar(onBackClick: () -> Unit) {
     Row(
@@ -283,6 +296,244 @@ fun ProfileActionButtons(
             colors = ButtonDefaults.buttonColors(containerColor = TealDark)
         ) {
             Text("Editar", fontWeight = FontWeight.Bold, color = Color.White)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileDropdownField(
+    label: String,
+    selectedOption: String,
+    options: List<String>,
+    isEditing: Boolean,
+    onOptionSelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+        Text(text = label, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DarkGrayText)
+        Spacer(modifier = Modifier.height(4.dp))
+
+        ExposedDropdownMenuBox(
+            expanded = isEditing && expanded,
+            onExpandedChange = { if (isEditing) expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = selectedOption,
+                onValueChange = {},
+                readOnly = true,
+                enabled = isEditing,
+                trailingIcon = { if (isEditing) ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                modifier = Modifier.fillMaxWidth().menuAnchor(),
+                shape = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TealDark,
+                    unfocusedBorderColor = LightBlueGray,
+                    focusedTextColor = DarkGrayText,
+                    unfocusedTextColor = DarkGrayText,
+                    disabledBorderColor = Color.Transparent,
+                    disabledTextColor = DarkGrayText,
+                    disabledContainerColor = Color.Transparent,
+                    disabledTrailingIconColor = Color.Transparent
+                )
+            )
+            if (isEditing) {
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(Color.White)
+                ) {
+                    options.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option, color = DarkGrayText) },
+                            onClick = {
+                                onOptionSelected(option)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@SuppressLint("NonObservableLocale")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileDateField(
+    label: String,
+    fechaMilisegundos: Long,
+    isEditing: Boolean,
+    onDateSelected: (Long) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+    val fechaFormateada = if (fechaMilisegundos > 0L) sdf.format(Date(fechaMilisegundos)) else "Seleccionar fecha"
+
+    Column(modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)) {
+        Text(text = label, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = DarkGrayText)
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = fechaFormateada,
+                onValueChange = {},
+                readOnly = true,
+                enabled = isEditing,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(8.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TealDark,
+                    unfocusedBorderColor = LightBlueGray,
+                    focusedTextColor = DarkGrayText,
+                    unfocusedTextColor = DarkGrayText,
+                    disabledBorderColor = Color.Transparent,
+                    disabledTextColor = DarkGrayText,
+                    disabledContainerColor = Color.Transparent
+                )
+            )
+            if (isEditing) {
+                Box(
+                    modifier = Modifier
+                        .matchParentSize()
+                        .clickable { showDialog = true }
+                        .background(Color.Transparent)
+                )
+            }
+        }
+    }
+
+    if (showDialog && isEditing) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = if (fechaMilisegundos > 0L) fechaMilisegundos else System.currentTimeMillis()
+        )
+
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onDateSelected(it) }
+                    showDialog = false
+                }) {
+                    Text("Aceptar", color = TealDark, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancelar", color = LightBlueGray)
+                }
+            },
+            colors = DatePickerDefaults.colors(containerColor = Color.White)
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+}
+
+
+
+@Composable
+fun ProfileAvatarSection(
+    nombre: String,
+    correo: String,
+    fotoPerfil: String?,
+    onEditPhotoClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box {
+            if (fotoPerfil.isNullOrEmpty()) {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = "Avatar del usuario",
+                    tint = Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier.size(100.dp)
+                )
+            } else {
+                AsyncImage(
+                    model = fotoPerfil,
+                    contentDescription = "Avatar del usuario",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .border(2.dp, Color.White, CircleShape)
+                )
+            }
+
+            IconButton(
+                onClick = onEditPhotoClick,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-4).dp, y = (-4).dp)
+                    .size(20.dp)
+                    .background(TealDark, CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Cambiar foto",
+                    tint = Color.White,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(text = nombre, fontSize = 22.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+        Text(text = correo, fontSize = 14.sp, color = Color.White.copy(alpha = 0.8f))
+    }
+}
+
+@Composable
+fun PhotoPreviewDialog(
+    imageUri: Uri,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(24.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Vista Previa", fontWeight = FontWeight.Bold, fontSize = 20.sp, color = DarkGrayText)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                AsyncImage(
+                    model = imageUri,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(150.dp)
+                        .clip(CircleShape)
+                        .border(4.dp, TealLight, CircleShape)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
+                        Text("Cancelar", color = LightBlueGray)
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Button(
+                        onClick = onSave,
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = TealDark)
+                    ) {
+                        Text("Guardar", color = Color.White)
+                    }
+                }
+            }
         }
     }
 }

@@ -13,22 +13,65 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
 import LosPrimos.Durango.calculadoragastos.ui.components.*
+import LosPrimos.Durango.calculadoragastos.utils.saveImageToInternalStorage
+import LosPrimos.Durango.calculadoragastos.viewModel.PerfilViewModel
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun PerfilScreen(
     onNavigate: (String) -> Unit,
-    onLogoutClick: () -> Unit
+    onLogoutClick: () -> Unit,
+    viewModel: PerfilViewModel
 ) {
+    val usuario by viewModel.usuarioState.collectAsState()
+
     var isEditing by remember { mutableStateOf(false) }
     val isOffline = true
 
-    var nombre by remember { mutableStateOf("Héctor Garduño") }
-    val correo = "elZombie32@cartablanca.com"
-    var fechaNacimiento by remember { mutableStateOf("29/11/2005") }
-    var genero by remember { mutableStateOf("Masculino") }
+    var nombreEdit by remember { mutableStateOf("") }
+    var generoEdit by remember { mutableStateOf("") }
+    var fechaEdit by remember { mutableStateOf(0L) }
 
     var isDarkMode by remember { mutableStateOf(false) }
     var isBiometricEnabled by remember { mutableStateOf(true) }
+
+
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
+    }
+
+    val context = LocalContext.current
+
+    if (selectedImageUri != null) {
+        PhotoPreviewDialog(
+            imageUri = selectedImageUri!!,
+            onDismiss = { selectedImageUri = null },
+            onSave = {
+                val localUri = saveImageToInternalStorage(context, selectedImageUri!!)
+
+                if (localUri != null) {
+                    viewModel.actualizarFotoPerfil(localUri.toString())
+                }
+
+                selectedImageUri = null
+            }
+        )
+    }
+
+    LaunchedEffect(usuario) {
+        usuario?.let {
+            nombreEdit = it.nombre
+            generoEdit = it.genero
+            fechaEdit = it.fechaNacimiento
+        }
+    }
 
     Scaffold(
         bottomBar = {
@@ -53,7 +96,14 @@ fun PerfilScreen(
 
                     ProfileTopBar(onBackClick = { onNavigate("home") })
 
-                    ProfileAvatarSection(nombre = nombre, correo = correo)
+                    ProfileAvatarSection(
+                        nombre = usuario?.nombre ?: "Cargando...",
+                        correo = usuario?.correo ?: "",
+                        fotoPerfil = usuario?.fotoPerfil,
+                        onEditPhotoClick = {
+                            galleryLauncher.launch("image/*")
+                        }
+                    )
 
                     Spacer(modifier = Modifier.height(24.dp))
                 }
@@ -70,38 +120,46 @@ fun PerfilScreen(
                                 title = "Información personal",
                                 isEditing = isEditing,
                                 onEditClick = { isEditing = true },
-                                onCancelClick = { isEditing = false },
+                                onCancelClick = {
+                                    isEditing = false
+                                    usuario?.let {
+                                        nombreEdit = it.nombre
+                                        generoEdit = it.genero
+                                    }
+                                },
                                 onSaveClick = {
+                                    viewModel.actualizarPerfil(nombreEdit, generoEdit, fechaEdit)
                                     isEditing = false
                                 }
                             )
 
                             ProfileFieldItem(
                                 label = "Nombre Completo",
-                                value = nombre,
+                                value = nombreEdit,
                                 isEditing = isEditing,
-                                onValueChange = { nombre = it }
+                                onValueChange = { nombreEdit = it }
                             )
 
                             ProfileFieldItem(
                                 label = "Correo Electrónico",
-                                value = correo,
+                                value = usuario?.correo ?: "",
                                 isEditing = false,
                                 onValueChange = {}
                             )
 
-                            ProfileFieldItem(
+                            ProfileDateField(
                                 label = "Fecha de Nacimiento",
-                                value = fechaNacimiento,
+                                fechaMilisegundos = fechaEdit,
                                 isEditing = isEditing,
-                                onValueChange = { fechaNacimiento = it }
+                                onDateSelected = { nuevaFecha -> fechaEdit = nuevaFecha }
                             )
 
-                            ProfileFieldItem(
+                            ProfileDropdownField(
                                 label = "Género",
-                                value = genero,
+                                selectedOption = generoEdit,
+                                options = listOf("Masculino", "Femenino", "Otro"),
                                 isEditing = isEditing,
-                                onValueChange = { genero = it }
+                                onOptionSelected = { nuevaOpcion -> generoEdit = nuevaOpcion }
                             )
                         }
 
