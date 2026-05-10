@@ -60,10 +60,10 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
     fun loginConBiometria(userId: Int) {
         viewModelScope.launch {
             try {
-                val usuario = usuarioRepository.obtenerUusarioPorId(userId)
+                val usuario = usuarioRepository.obtenerUsuarioPorId(userId)
                 if (usuario != null) {
-                    dataStore.saveSession(usuario.idUsuario)
-                    _authState.value = AuthState.Success(usuario.idUsuario)
+                    dataStore.saveSession(userId)
+                    _authState.value = AuthState.Success(userId)
                 } else {
                     _authState.value = AuthState.Error("No se encontró el usuario")
                 }

@@ -12,6 +12,7 @@ import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GraficasScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GruposScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.PerfilScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.PresupuestosScreen
 import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
@@ -140,9 +141,16 @@ fun AppNavigationController(
             )
         }
 
-//        composable(Screen.Presupuestos.route) {
-//            //PresupuestosScreen(navController)
-//        }
+        composable(Screen.Presupuestos.route) {
+            PresupuestosScreen(
+                onNavigate = { ruta ->
+                    navController.navigate(ruta) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
+        }
 
 
 
