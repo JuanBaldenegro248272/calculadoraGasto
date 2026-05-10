@@ -6,6 +6,7 @@ import LosPrimos.Durango.calculadoragastos.ui.components.AuthBackground
 import LosPrimos.Durango.calculadoragastos.ui.components.ColorPink
 import LosPrimos.Durango.calculadoragastos.ui.components.SpentButton
 import LosPrimos.Durango.calculadoragastos.ui.components.SpentTextField
+import LosPrimos.Durango.calculadoragastos.utils.Biometrics
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthState
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.R.attr.password
@@ -35,10 +36,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
@@ -112,6 +115,22 @@ fun LoginScreen(
                 }
 
             } else {
+                val context = LocalContext.current
+                val activity = context as FragmentActivity
+
+                val Helper = remember(activity) {
+                    Biometrics(
+                        activity = activity,
+                        onSuccess = {
+                            usuarioRecordado?.idUsuario?.let { id ->
+                                viewModel.loginConBiometria(id)
+                            }
+                        },
+                        onError = { error ->
+                        }
+                    )
+                }
+
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
                     contentDescription = "Avatar",
@@ -120,7 +139,11 @@ fun LoginScreen(
                 )
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Bienvenido, ${usuarioRecordado!!.nombre}", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        "Bienvenido, ${usuarioRecordado!!.nombre}",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                     Text(
                         text = "¿No Eres ${usuarioRecordado!!.nombre}?",
                         color = ColorPink,
@@ -134,16 +157,30 @@ fun LoginScreen(
                     onValueChange = { password = it },
                     placeholder = "Contraseña",
                     isPassword = true,
-                    trailingIcon = { Icon(Icons.Outlined.Lock, contentDescription = null, tint = Color.Gray) }
+                    trailingIcon = {
+                        Icon(Icons.Outlined.Lock, contentDescription = null, tint = Color.Gray)
+                    }
                 )
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.clickable { }
-                ) {
-                    Icon(Icons.Filled.Face, contentDescription = "Huella", tint = ColorPink, modifier = Modifier.size(32.dp))
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Iniciar Sesion con Biometria", color = ColorPink, fontWeight = FontWeight.Bold)
+                // Botón biométrico — solo visible si el dispositivo lo soporta
+                if (Helper.isDisponible()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.clickable { Helper.mostrarPrompt() }
+                    ) {
+                        Icon(
+                            Icons.Filled.Face,
+                            contentDescription = "Huella",
+                            tint = ColorPink,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            "Iniciar sesión con biometría",
+                            color = ColorPink,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 SpentButton(text = "Iniciar sesión") {

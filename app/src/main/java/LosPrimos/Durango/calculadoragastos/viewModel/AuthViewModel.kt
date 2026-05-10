@@ -57,6 +57,22 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
         }
     }
 
+    fun loginConBiometria(userId: Int) {
+        viewModelScope.launch {
+            try {
+                val usuario = usuarioRepository.obtenerUusarioPorId(userId)
+                if (usuario != null) {
+                    dataStore.saveSession(usuario.idUsuario)
+                    _authState.value = AuthState.Success(usuario.idUsuario)
+                } else {
+                    _authState.value = AuthState.Error("No se encontró el usuario")
+                }
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error("Error de autenticación: ${e.message}")
+            }
+        }
+    }
+
     fun logout() {
         viewModelScope.launch {
             dataStore.logout()

@@ -16,12 +16,13 @@ import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
