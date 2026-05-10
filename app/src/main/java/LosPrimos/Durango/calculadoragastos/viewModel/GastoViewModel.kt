@@ -5,6 +5,7 @@ import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,5 +22,9 @@ class GastoViewModel(private val repository: GastoRepository, private val dataSt
         viewModelScope.launch {
             repository.insertarGasto(gasto)
         }
+    }
+
+    fun obtenerGastosPorUsuario(usuarioId: Int?): Flow<List<Gasto>> {
+        return repository.obtenerListagastosPorUsuario(usuarioId ?: 0)
     }
 }

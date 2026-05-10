@@ -111,7 +111,10 @@ fun AppNavigationController(
         // navegacion inferior
         composable(Screen.Home.route) {
             HomeScreen(
-                onNavigate = { rutaDestino ->
+                gastoViewModel = gastoViewModel,
+                ingresoViewModel = ingresoViewModel,
+                onNavigate = {
+                    rutaDestino ->
                     navController.navigate(rutaDestino) {
                         launchSingleTop = true
                         restoreState = true

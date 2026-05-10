@@ -21,10 +21,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
 import LosPrimos.Durango.calculadoragastos.ui.components.*
+import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
+import android.os.Build
+import androidx.annotation.RequiresApi
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun HomeScreen(onNavigate: (String) -> Unit,
+fun HomeScreen(
+    gastoViewModel: GastoViewModel,
+    ingresoViewModel: IngresoViewModel,
+    onNavigate: (String) -> Unit,
 ) {
+    val usuarioActualId by ingresoViewModel.usuarioActualId.collectAsState()
+    val ingresos by ingresoViewModel.obtenerIngresosPorUsuario(usuarioActualId).collectAsState(initial = emptyList())
+    val gastos by gastoViewModel.obtenerGastosPorUsuario(usuarioActualId).collectAsState(initial = emptyList())
     var isGastosSelected by remember { mutableStateOf(true) }
     var mesSeleccionado by remember { mutableStateOf("Abril") }
     var showFabMenu by remember { mutableStateOf(false) }
@@ -155,33 +169,25 @@ fun HomeScreen(onNavigate: (String) -> Unit,
 
                             if (isGastosSelected) {
                                 item {
-                                    CategoryGroup(
-                                        nombreCategoria = "Comida",
-                                        iconoCategoria = Icons.Default.Restaurant
-                                    ) {
-                                        TransactionItem("Comida del Clancys", "1 Abr 2026", 1200.0, true)
-                                        TransactionItem("Walmart", "2 Abr 2026", 850.0, true)
-                                    }
-                                }
-
-                                item {
-                                    CategoryGroup(
-                                        nombreCategoria = "Transporte",
-                                        iconoCategoria = Icons.Default.DirectionsCar
-                                    ) {
-                                        TransactionItem("Gasolina", "3 Abr 2026", 500.0, true)
-                                        TransactionItem("Uber casa", "5 Abr 2026", 120.0, true)
-                                    }
+                                    gastos.forEach { gasto ->
+                                        TransactionItem(
+                                            gasto.descripcion,
+                                            formatoFecha(gasto.fecha),
+                                            gasto.monto,
+                                            true
+                                            )
+                                        }
                                 }
                             } else {
                                 item {
-                                    CategoryGroup(
-                                        nombreCategoria = "Ingresos",
-                                        iconoCategoria = null
-                                    ) {
-                                        TransactionItem("Sueldo Quincenal", "1 Abr 2026", 2500.0, false)
-                                        TransactionItem("Venta de mi bici", "4 Abr 2026", 1500.0, false)
-                                        TransactionItem("Feria que me encontre", "10 Abr 2026", 500.0, false)
+                                    ingresos.forEach { ingreso ->
+                                        TransactionItem(
+                                            ingreso.descripcion,
+                                            formatoFecha(ingreso.fecha),
+                                                ingreso.monto,
+                                            false
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -191,6 +197,11 @@ fun HomeScreen(onNavigate: (String) -> Unit,
             }
         }
     }
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatoFecha(fecha: Long): String{
+    val formato = DateTimeFormatter.ofPattern("dd MMM yyyy")
+    return Instant.ofEpochMilli(fecha).atZone(ZoneId.systemDefault()).toLocalDate().format(formato)
 }
 
 

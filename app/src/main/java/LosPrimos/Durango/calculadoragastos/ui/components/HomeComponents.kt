@@ -15,7 +15,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
-import android.hardware.lights.Light
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
@@ -337,7 +336,7 @@ fun CategoryGroup(
 
 @Composable
 fun TransactionItem(
-    titulo: String,
+    titulo: String?,
     fecha: String,
     monto: Double,
     isGasto: Boolean
@@ -350,7 +349,7 @@ fun TransactionItem(
     ) {
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(titulo, fontWeight = FontWeight.Bold, color = DarkGrayText, fontSize = 16.sp)
+            Text(titulo ?:"", fontWeight = FontWeight.Bold, color = DarkGrayText, fontSize = 16.sp)
             Text(fecha, color = LightBlueGray, fontSize = 12.sp)
         }
 

@@ -5,6 +5,7 @@ import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
 import LosPrimos.Durango.calculadoragastos.data.repositories.IngresoRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,5 +22,9 @@ class IngresoViewModel(private val repository: IngresoRepository, dataStore: Dat
         viewModelScope.launch {
             repository.insertIngreso(ingreso)
         }
+    }
+
+    fun obtenerIngresosPorUsuario(idUsuario: Int?): Flow<List<Ingreso>> {
+            return repository.obtenerIngresosPorUsuario(idUsuario ?: 0)
     }
 }
