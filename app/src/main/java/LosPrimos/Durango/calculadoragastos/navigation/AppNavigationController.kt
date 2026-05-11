@@ -14,6 +14,7 @@ import LosPrimos.Durango.calculadoragastos.ui.screens.GraficasScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GruposScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.PerfilScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.PresupuestosScreen
+import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
 import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
@@ -24,11 +25,15 @@ import LosPrimos.Durango.calculadoragastos.viewModel.PerfilViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.platform.LocalContext
@@ -84,13 +89,28 @@ fun AppNavigationController(
     factory: AppViewModelFactory
 
 ) {
+
+
     val loggedIn by authViewModel.isLoggedIn.collectAsState()
     val context = LocalContext.current
     val database = SpentDatabase.getDatabase(context)
     val gastoRepository = GastoRepository(database.gastoDao())
     val dataStoreManager = remember { DataStoreManager(context) }
+    val sesionVerificada by authViewModel.sesionVerificada.collectAsState()
 
+    LaunchedEffect(Unit) {
+        authViewModel.verificarSesion()
+    }
 
+    if (!sesionVerificada) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = TealDark)
+        }
+        return
+    }
 
 
 
@@ -106,13 +126,10 @@ fun AppNavigationController(
         navController = navController,
         startDestination = if (loggedIn) Screen.Home.route else Screen.Login.route
     ) {
-
         composable(Screen.Login.route) {
             LoginScreen(
                 viewModel = authViewModel,
-                onNavigateToRegister = {
-                    navController.navigate(Screen.Register.route)
-                },
+                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onLoginSuccess = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
@@ -131,16 +148,14 @@ fun AppNavigationController(
                 gastoViewModel = gastoViewModel,
                 ingresoViewModel = ingresoViewModel,
                 categoriaViewModel = categoriaViewModel,
-                onNavigate = {
-                    rutaDestino ->
+                onNavigate = { rutaDestino ->
                     navController.navigate(rutaDestino) {
                         launchSingleTop = true
                         restoreState = true
                     }
-                },
+                }
             )
         }
-
 
         composable(Screen.Grupos.route) {
             GruposScreen(
@@ -177,12 +192,9 @@ fun AppNavigationController(
             )
         }
 
-
-
         composable(Screen.Perfil.route) {
             val perfilViewModel: PerfilViewModel = viewModel(factory = factory)
             PerfilScreen(
-
                 onNavigate = { ruta ->
                     navController.navigate(ruta) {
                         launchSingleTop = true
@@ -205,7 +217,6 @@ fun AppNavigationController(
             arguments = listOf(navArgument("grupoId") { type = NavType.IntType })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getInt("grupoId") ?: 0
-            //DetalleGrupoScreen(id, navController)
         }
 
         // Formulario de Gasto (Individual o Grupo)
@@ -238,10 +249,11 @@ fun AppNavigationController(
             )
         }
 
-
         composable(Screen.AgregarIngreso.route) {
-            AgregarIngresoScreen(onBack = { navController.popBackStack() },
-                ingresoViewModel)
+            AgregarIngresoScreen(
+                onBack = { navController.popBackStack() },
+                ingresoViewModel = ingresoViewModel
+            )
         }
 
         composable(
@@ -255,8 +267,5 @@ fun AppNavigationController(
                 idIngresoEditar = idIngreso
             )
         }
-
-        // Formulario de Tarjeta
-        //composable(Screen.AgregarTarjeta.route) { TarjetaScreen(navController) }
     }
 }

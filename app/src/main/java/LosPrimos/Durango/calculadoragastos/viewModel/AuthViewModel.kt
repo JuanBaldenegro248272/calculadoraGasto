@@ -18,6 +18,9 @@ sealed class AuthState {
 
 class AuthViewModel(private val usuarioRepository: UsuarioRepository, private val dataStore: DataStoreManager): ViewModel() {
 
+    private val _sesionVerificada = MutableStateFlow(false)
+    val sesionVerificada: StateFlow<Boolean> = _sesionVerificada.asStateFlow()
+
     val isLoggedIn = dataStore.isLoggedInFlow.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -29,6 +32,21 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
         SharingStarted.WhileSubscribed(5000),
         null
     )
+
+    fun verificarSesion() {
+        viewModelScope.launch {
+            val id = dataStore.userIdFlow.first()
+            if (id != null && id != 0) {
+                val usuarioExiste = usuarioRepository.existeUsuario(id)
+                if (!usuarioExiste) {
+                    dataStore.logout()
+                }
+            } else {
+                dataStore.logout()
+            }
+            _sesionVerificada.value = true
+        }
+    }
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Idle)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()

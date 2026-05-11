@@ -21,6 +21,10 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
         return usuarioDao.getUsuarioById(usuarioId)
     }
 
+    suspend fun existeUsuario(id: Int): Boolean {
+        return usuarioDao.getUsuarioByIdSuspend(id) != null
+    }
+
 
     suspend fun verificarCorreoExistente(correo: String): Usuario? {
         return usuarioDao.verificarCorreoExistente(correo)
