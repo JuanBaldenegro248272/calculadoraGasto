@@ -1,6 +1,8 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
+import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
+import LosPrimos.Durango.calculadoragastos.data.enums.TipoPago
 import LosPrimos.Durango.calculadoragastos.ui.components.FormDateField
 import LosPrimos.Durango.calculadoragastos.ui.components.GradientFormBackground
 import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
@@ -44,6 +46,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -62,13 +65,16 @@ import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel) {
+fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel, idIngresoEditar: Int? = null) {
     val usuarioActualId = ingresoViewModel.usuarioActualId.collectAsState()
     val formato = DateTimeFormatter.ofPattern("dd / MM / yyyy")
     var monto by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var fechaLong by remember {
         mutableStateOf(LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
+    }
+    val ingresoExistente by produceState<Ingreso?>(initialValue = null, idIngresoEditar) {
+        value = idIngresoEditar?.let { ingresoViewModel.obtenerIngresoPorId(it) }
     }
 
     val context = LocalContext.current
@@ -97,6 +103,14 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel)
         } else {
             lugar = "Permiso denegado"
             isLoadingLocation = false
+        }
+    }
+
+    LaunchedEffect(ingresoExistente) {
+        ingresoExistente?.let { i ->
+            monto = i.monto.toString()
+            descripcion = i.descripcion ?: ""
+            fechaLong = i.fecha
         }
     }
 
@@ -200,7 +214,7 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel)
                     } else null
 
                     val nuevoIngreso = Ingreso(
-                        idIngreso = 0,
+                        idIngreso = idIngresoEditar ?: 0,
                         monto = montoDouble,
                         fecha = fechaLong,
                         descripcion = descripcion,
@@ -210,7 +224,11 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel)
                         fotoRecibo = uriFinal?.toString()
                     )
 
-                    ingresoViewModel.insertarIngreso(nuevoIngreso)
+                    if (idIngresoEditar == null) {
+                        ingresoViewModel.insertarIngreso(nuevoIngreso)
+                    } else {
+                        ingresoViewModel.actualizarIngreso(nuevoIngreso)
+                    }
                     onBack()
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally).width(190.dp).height(48.dp),
@@ -218,7 +236,13 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel)
                 shape = RoundedCornerShape(9.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
-                Text(text = "Guardar", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                Text(if (idIngresoEditar == null)
+                    "Guardar"
+                else
+                    "Actualizar",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(130.dp))

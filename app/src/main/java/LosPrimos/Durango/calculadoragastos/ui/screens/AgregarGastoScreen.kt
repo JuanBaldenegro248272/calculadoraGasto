@@ -71,15 +71,21 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import android.Manifest
+import androidx.compose.runtime.produceState
+import java.time.ZoneId
+import kotlin.time.Instant
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categoriaViewModel: CategoriaViewModel) {
+fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categoriaViewModel: CategoriaViewModel, idGastoEditar: Int? = null) {
     val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
     var menuCategorias by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf<Categoria?>(null) }
     val usuarioActualId by gastoviewModel.usuarioActualId.collectAsState()
+    val gastoExistente by produceState<Gasto?>(initialValue = null, idGastoEditar) {
+        value = idGastoEditar?.let { gastoviewModel.obtenerGastoPorId(it) }
+    }
     val formato = DateTimeFormatter.ofPattern("dd / MM / yyyy")
     var monto by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
@@ -116,6 +122,21 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
         } else {
             lugar = "Permiso denegado"
             isLoadingLocation = false
+        }
+    }
+
+    LaunchedEffect(gastoExistente) {
+        gastoExistente?.let { g ->
+            monto = g.monto.toString()
+            descripcion = g.descripcion
+            metodoPago = if (g.tipoPago == TipoPago.EFECTIVO) {
+                "Efectivo"
+            } else {
+                "Tarjeta"
+            }
+            fechaLong = g.fecha
+            categoriaSeleccionada =
+                categorias.find { it.idCategoria == g.idCategoria }
         }
     }
 
@@ -305,34 +326,33 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
 
             Button(
                 onClick = {
-                    if (usuarioActualId == null || usuarioActualId == 0) {
-                        return@Button
-                    }
+                    if (usuarioActualId == null || usuarioActualId == 0) return@Button
 
-                    val montoDouble = monto.toDoubleOrNull()
-                    if (montoDouble == null) {
-                        return@Button
-                    }
+                    val montoDouble = monto.toDoubleOrNull() ?: return@Button
 
-                    val uriFinal = if (fotoUri != null) {
-                        saveImageToInternalStorage(context, fotoUri!!)
-                    } else null
-
-
-                    val nuevoGasto = Gasto(
-                        idGasto = 0,
+                    val gasto = Gasto(
+                        idGasto = idGastoEditar ?: 0,
                         idUsuarioPaga = usuarioActualId!!,
                         idCategoria = categoriaSeleccionada?.idCategoria,
                         idGrupo = null,
                         idTarjeta = null,
-                        monto = monto.toDoubleOrNull() ?: 0.0,
+                        monto = montoDouble,
                         descripcion = descripcion,
                         fecha = fechaLong,
-                        tipoPago = if (metodoPago == "Efectivo") TipoPago.EFECTIVO else TipoPago.TARJETA,
-                        lugar = lugar,
-                        fotoRecibo = uriFinal?.toString()
+                        tipoPago = if (metodoPago == "Efectivo") {
+                            TipoPago.EFECTIVO
+                        } else {
+                            TipoPago.TARJETA
+                        },
+                        lugar = "",
+                        fotoRecibo = null
                     )
-                    gastoviewModel.insertarGasto(nuevoGasto)
+
+                    if (idGastoEditar == null) {
+                        gastoviewModel.insertarGasto(gasto)
+                    } else {
+                        gastoviewModel.actualizarGasto(gasto)
+                    }
                     onBack()
                 },
                 modifier = Modifier
@@ -343,8 +363,10 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
                 shape = RoundedCornerShape(9.dp),
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
-                Text(
-                    text = "Guardar",
+                Text(if (idGastoEditar == null)
+                    "Guardar"
+                else
+                    "Actualizar",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color.White

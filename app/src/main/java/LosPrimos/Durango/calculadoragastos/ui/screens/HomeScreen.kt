@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
 import LosPrimos.Durango.calculadoragastos.ui.components.*
+import LosPrimos.Durango.calculadoragastos.utils.SwipeToReveal
 import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
@@ -41,8 +42,10 @@ fun HomeScreen(
     categoriaViewModel: CategoriaViewModel
 ) {
     val usuarioActualId by ingresoViewModel.usuarioActualId.collectAsState()
-    val ingresos by ingresoViewModel.obtenerIngresosPorUsuario(usuarioActualId).collectAsState(initial = emptyList())
-    val gastos by gastoViewModel.obtenerGastosPorUsuario(usuarioActualId).collectAsState(initial = emptyList())
+    val ingresos by ingresoViewModel.obtenerIngresosPorUsuario(usuarioActualId)
+        .collectAsState(initial = emptyList())
+    val gastos by gastoViewModel.obtenerGastosPorUsuario(usuarioActualId)
+        .collectAsState(initial = emptyList())
     val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
     val nombresCategorias = listOf("Todas") + categorias.map { it.nombre }
 
@@ -71,10 +74,12 @@ fun HomeScreen(
 
     val gastosFiltrados = gastos.filter { gasto ->
         val date = Instant.ofEpochMilli(gasto.fecha).atZone(ZoneId.systemDefault()).toLocalDate()
-        val matchMes = if (mesSeleccionado == "Todos") true else date.monthValue == mesesMap[mesSeleccionado]
+        val matchMes =
+            if (mesSeleccionado == "Todos") true else date.monthValue == mesesMap[mesSeleccionado]
 
         val nombreCat = categorias.find { it.idCategoria == gasto.idCategoria }?.nombre ?: "Otros"
-        val matchCat = if (categoriaSeleccionada == "Todas") true else nombreCat == categoriaSeleccionada
+        val matchCat =
+            if (categoriaSeleccionada == "Todas") true else nombreCat == categoriaSeleccionada
 
         matchMes && matchCat
     }
@@ -104,8 +109,10 @@ fun HomeScreen(
                         modifier = Modifier.padding(bottom = 16.dp)
                     ) {
                         ExtendedFloatingActionButton(
-                            onClick = { showFabMenu = false
-                                onNavigate(Screen.AgregarIngreso.route)},
+                            onClick = {
+                                showFabMenu = false
+                                onNavigate(Screen.AgregarIngreso.route)
+                            },
                             containerColor = TealDark,
                             contentColor = Color.White,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -116,8 +123,10 @@ fun HomeScreen(
                         }
 
                         ExtendedFloatingActionButton(
-                            onClick = { showFabMenu = false
-                                onNavigate(Screen.AgregarGasto.createRoute())},
+                            onClick = {
+                                showFabMenu = false
+                                onNavigate(Screen.AgregarGasto.createRoute())
+                            },
                             containerColor = MagentaPink,
                             contentColor = Color.White
                         ) {
@@ -164,7 +173,12 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Inicio", fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                        Text(
+                            "Inicio",
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
+                        )
 
                     }
                 }
@@ -215,16 +229,14 @@ fun HomeScreen(
                             contentPadding = PaddingValues(bottom = 80.dp)
                         ) {
 
-
                             if (isOffline) {
-                                item {
-                                    OfflineListWarning()
-                                }
+                                item { OfflineListWarning() }
                             }
 
                             if (isGastosSelected) {
                                 val gastosAgrupados = gastosFiltrados.groupBy { gasto ->
-                                    categorias.find { it.idCategoria == gasto.idCategoria }?.nombre ?: "Otros"
+                                    categorias.find { it.idCategoria == gasto.idCategoria }?.nombre
+                                        ?: "Otros"
                                 }
 
                                 gastosAgrupados.forEach { (nombreCategoria, listaGastos) ->
@@ -234,29 +246,62 @@ fun HomeScreen(
                                             iconoCategoria = null
                                         ) {
                                             listaGastos.forEach { gasto ->
-                                                TransactionItem(
-                                                    titulo = gasto.descripcion,
-                                                    fecha = formatoFecha(gasto.fecha),
-                                                    monto = gasto.monto,
-                                                    isGasto = true
-                                                )
+                                                SwipeToReveal(
+                                                    onEdit = {
+                                                        onNavigate(
+                                                            Screen.EditarGasto.createRoute(
+                                                                gasto.idGasto
+                                                            )
+                                                        )
+                                                    },
+                                                    onDelete = {
+                                                        gastoViewModel.eliminarGasto(gasto)
+                                                    }
+                                                ) {
+                                                    TransactionItem(
+                                                        titulo = gasto.descripcion,
+                                                        fecha = formatoFecha(gasto.fecha),
+                                                        monto = gasto.monto,
+                                                        isGasto = true
+                                                    )
+                                                }
                                             }
                                         }
                                     }
                                 }
+
                                 if (gastosFiltrados.isEmpty()) {
-                                    item { Text("No hay gastos en este mes/categoría", modifier = Modifier.padding(16.dp)) }
+                                    item {
+                                        Text(
+                                            "No hay gastos en este mes/categoría",
+                                            modifier = Modifier.padding(16.dp)
+                                        )
+                                    }
                                 }
+
                             } else {
                                 item {
                                     CategoryGroup("Ingresos", Icons.Default.ArrowUpward) {
                                         ingresosFiltrados.forEach { ingreso ->
-                                            TransactionItem(
-                                                titulo = ingreso.descripcion,
-                                                fecha = formatoFecha(ingreso.fecha),
-                                                monto = ingreso.monto,
-                                                isGasto = false
-                                            )
+                                            SwipeToReveal(
+                                                onEdit = {
+                                                    onNavigate(
+                                                        Screen.EditarIngreso.createRoute(
+                                                            ingreso.idIngreso
+                                                        )
+                                                    )
+                                                },
+                                                onDelete = {
+                                                    ingresoViewModel.eliminarIngreso(ingreso)
+                                                }
+                                            ) {
+                                                TransactionItem(
+                                                    titulo = ingreso.descripcion,
+                                                    fecha = formatoFecha(ingreso.fecha),
+                                                    monto = ingreso.monto,
+                                                    isGasto = false
+                                                )
+                                            }
                                         }
                                     }
                                 }
