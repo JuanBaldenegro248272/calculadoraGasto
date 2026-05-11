@@ -24,6 +24,18 @@ class IngresoViewModel(private val repository: IngresoRepository, dataStore: Dat
         }
     }
 
+    fun actualizarIngreso(ingreso: Ingreso) {
+        viewModelScope.launch { repository.updateIngreso(ingreso) }
+    }
+
+    fun eliminarIngreso(ingreso: Ingreso) {
+        viewModelScope.launch { repository.deleteIngreso(ingreso) }
+    }
+
+    suspend fun obtenerIngresoPorId(id: Int): Ingreso? {
+        return repository.obtenerIngresoPorId(id)
+    }
+
     fun obtenerIngresosPorUsuario(idUsuario: Int?): Flow<List<Ingreso>> {
             return repository.obtenerIngresosPorUsuario(idUsuario ?: 0)
     }

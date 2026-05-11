@@ -19,6 +19,8 @@ class GastoRepository (private val gastoDao: GastoDao){
         return gastoDao.deleteGasto(gasto)
     }
 
+    suspend fun obtenerGastoPorId(id: Int): Gasto? = gastoDao.getGastoById(id)
+
      fun obtenerListagastosPorUsuario(idUsuario: Int): Flow<List<Gasto>> {
         return gastoDao.getGastosByUsuario(idUsuario)
     }

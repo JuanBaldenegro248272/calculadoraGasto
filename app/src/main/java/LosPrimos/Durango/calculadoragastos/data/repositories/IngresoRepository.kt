@@ -19,6 +19,8 @@ class IngresoRepository(private val ingresoDao: IngresoDao){
         return ingresoDao.deleteIngreso(ingreso)
     }
 
+    suspend fun obtenerIngresoPorId(id: Int): Ingreso? = ingresoDao.getIngresoById(id)
+
      fun obtenerIngresosPorUsuario(idUsuario: Int): Flow<List<Ingreso>> {
         return ingresoDao.getIngresosByUsuario(idUsuario)
     }

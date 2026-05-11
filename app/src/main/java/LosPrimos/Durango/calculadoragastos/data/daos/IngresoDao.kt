@@ -13,8 +13,10 @@ interface IngresoDao {
     suspend fun updateIngreso(ingreso: Ingreso): Int
     @Delete
     suspend fun deleteIngreso(ingreso: Ingreso): Int
-    @Query("SELECT * FROM ingresos WHERE idUsuario = :idUsuario ORDER BY fecha DESC")
 
+    @Query("SELECT * FROM ingresos WHERE idIngreso = :id")
+    suspend fun getIngresoById(id: Int): Ingreso?
+    @Query("SELECT * FROM ingresos WHERE idUsuario = :idUsuario ORDER BY fecha DESC")
     fun getIngresosByUsuario(idUsuario: Int): Flow<List<Ingreso>>
     @Query("SELECT SUM(monto) FROM ingresos WHERE idUsuario = :idUsuario AND fecha BETWEEN :inicio AND :fin")
     fun getSumaIngresosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?>

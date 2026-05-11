@@ -24,6 +24,18 @@ class GastoViewModel(private val repository: GastoRepository, private val dataSt
         }
     }
 
+    fun actualizarGasto(gasto: Gasto) {
+        viewModelScope.launch { repository.updateGasto(gasto) }
+    }
+
+    fun eliminarGasto(gasto: Gasto) {
+        viewModelScope.launch { repository.deleteGasto(gasto) }
+    }
+
+    suspend fun obtenerGastoPorId(id: Int): Gasto? {
+        return repository.obtenerGastoPorId(id)
+    }
+
     fun obtenerGastosPorUsuario(usuarioId: Int?): Flow<List<Gasto>> {
         return repository.obtenerListagastosPorUsuario(usuarioId ?: 0)
     }
