@@ -16,12 +16,14 @@ import LosPrimos.Durango.calculadoragastos.ui.screens.PresupuestosScreen
 import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PerfilViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -84,7 +86,11 @@ fun AppNavigationController(
 
     val gastoViewModel: GastoViewModel = viewModel(factory = factory)
     val ingresoViewModel: IngresoViewModel = viewModel(factory = factory)
+    val categoriaViewModel: CategoriaViewModel = viewModel(factory = factory)
 
+    LaunchedEffect(Unit) {
+        categoriaViewModel.insertarCategorias()
+    }
     NavHost(
         navController = navController,
         startDestination = if (loggedIn) Screen.Home.route else Screen.Login.route
@@ -199,7 +205,8 @@ fun AppNavigationController(
             val id = backStackEntry.arguments?.getInt("grupoId")
             val grupoId = if (id == -1) null else id
             AgregarGastoScreen(onBack = { navController.popBackStack() },
-                                gastoviewModel = gastoViewModel
+                                gastoviewModel = gastoViewModel,
+                categoriaViewModel = categoriaViewModel
                 )
         }
 

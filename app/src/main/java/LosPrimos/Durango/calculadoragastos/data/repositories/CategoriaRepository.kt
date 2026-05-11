@@ -18,7 +18,7 @@ class CategoriaRepository(private val categoriaDao: CategoriaDao) {
         return categoriaDao.updateCategoria(categoria)
     }
 
-    suspend fun getCategorias(idCategoria: Int): Categoria?{
+    suspend fun getCategoria(idCategoria: Int): Categoria?{
         return categoriaDao.getCategoriaById(idCategoria).firstOrNull()
     }
 

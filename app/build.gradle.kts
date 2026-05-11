@@ -43,6 +43,7 @@ ksp {
 dependencies {
     implementation("androidx.biometric:biometric:1.1.0")
     implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.foundation.layout)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

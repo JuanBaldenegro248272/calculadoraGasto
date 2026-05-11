@@ -1,5 +1,6 @@
 package LosPrimos.Durango.calculadoragastos.data
 
+import LosPrimos.Durango.calculadoragastos.data.daos.CategoriaDao
 import LosPrimos.Durango.calculadoragastos.data.daos.GastoDao
 import LosPrimos.Durango.calculadoragastos.data.daos.IngresoDao
 import LosPrimos.Durango.calculadoragastos.data.daos.UsuarioDao
@@ -23,6 +24,7 @@ abstract class SpentDatabase : RoomDatabase(){
     abstract fun usuarioDao(): UsuarioDao
     abstract fun gastoDao(): GastoDao
     abstract fun ingresoDao(): IngresoDao
+    abstract fun categoriaDao(): CategoriaDao
 
     companion object {
         @Volatile

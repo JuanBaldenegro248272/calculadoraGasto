@@ -1,16 +1,19 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
+import LosPrimos.Durango.calculadoragastos.data.entities.Categoria
 import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.data.enums.TipoPago
 import LosPrimos.Durango.calculadoragastos.ui.components.GradientFormBackground
 import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
+import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +30,8 @@ import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -53,7 +58,10 @@ import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel) {
+fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categoriaViewModel: CategoriaViewModel) {
+    val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
+    var menuCategorias by remember { mutableStateOf(false) }
+    var categoriaSeleccionada by remember { mutableStateOf<Categoria?>(null) }
     val usuarioActualId by gastoviewModel.usuarioActualId.collectAsState()
     val formato = DateTimeFormatter.ofPattern("dd / MM / yyyy")
     var monto by remember { mutableStateOf("") }
@@ -111,23 +119,44 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel) {
                 fontSize = 14.sp,
                 color = Color.Black
             )
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.height(32.dp),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, Color(0xFFC8C2D2)),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color(0xFFF9F9F9),
-                    contentColor = Color(0xFF202124)
-                )
-            ) {
-                Text(text = "Alimentacion", fontSize = 13.sp)
-                Spacer(modifier = Modifier.width(10.dp))
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Seleccionar categoria",
-                    modifier = Modifier.size(18.dp)
-                )
+            Box {
+                OutlinedButton(
+                    onClick = { menuCategorias = true },
+                    modifier = Modifier.height(32.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.dp, Color(0xFFC8C2D2)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = Color(0xFFF9F9F9),
+                        contentColor = Color(0xFF202124)
+                    )
+                ) {
+                    Text(
+                        text = categoriaSeleccionada?.nombre ?: "Otros",
+                        fontSize = 13.sp
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = "Seleccionar categoria",
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                DropdownMenu(
+                    expanded = menuCategorias,
+                    onDismissRequest = { menuCategorias = false }
+                ) {
+                    categorias.forEach { categoria ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = categoria.nombre)
+                            },
+                            onClick = {
+                                categoriaSeleccionada = categoria
+                                menuCategorias = false
+                            }
+                        )
+                    }
+                }
             }
 
             Text(

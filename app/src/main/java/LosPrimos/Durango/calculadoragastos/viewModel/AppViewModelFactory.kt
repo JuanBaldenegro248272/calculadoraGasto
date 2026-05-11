@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.viewModel
 
 import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
+import LosPrimos.Durango.calculadoragastos.data.repositories.CategoriaRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.IngresoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
@@ -11,7 +12,8 @@ class AppViewModelFactory(
     private val gastoRepository: GastoRepository,
     private val usuarioRepository: UsuarioRepository,
     private val dataStoreManager: DataStoreManager,
-    private val ingresoRepository: IngresoRepository
+    private val ingresoRepository: IngresoRepository,
+    private val categoriaRepository: CategoriaRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -28,6 +30,9 @@ class AppViewModelFactory(
         }
         if (modelClass.isAssignableFrom(PerfilViewModel::class.java)) {
             return PerfilViewModel(usuarioRepository, dataStoreManager) as T
+        }
+        if (modelClass.isAssignableFrom(CategoriaViewModel::class.java)){
+            return CategoriaViewModel(categoriaRepository) as T
         }
         throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     }
