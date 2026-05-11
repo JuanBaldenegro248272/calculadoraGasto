@@ -124,7 +124,7 @@ fun AppNavigationController(
     }
     NavHost(
         navController = navController,
-        startDestination = if (loggedIn) Screen.Home.route else Screen.Login.route
+        startDestination = Screen.Login.route
     ) {
         composable(Screen.Login.route) {
             LoginScreen(
