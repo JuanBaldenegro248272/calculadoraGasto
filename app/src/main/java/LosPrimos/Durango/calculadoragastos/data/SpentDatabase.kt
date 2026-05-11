@@ -3,10 +3,12 @@ package LosPrimos.Durango.calculadoragastos.data
 import LosPrimos.Durango.calculadoragastos.data.daos.CategoriaDao
 import LosPrimos.Durango.calculadoragastos.data.daos.GastoDao
 import LosPrimos.Durango.calculadoragastos.data.daos.IngresoDao
+import LosPrimos.Durango.calculadoragastos.data.daos.PresupuestoDao
 import LosPrimos.Durango.calculadoragastos.data.daos.UsuarioDao
 import LosPrimos.Durango.calculadoragastos.data.entities.Categoria
 import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
+import LosPrimos.Durango.calculadoragastos.data.entities.Presupuesto
 import LosPrimos.Durango.calculadoragastos.data.entities.Tarjeta
 import LosPrimos.Durango.calculadoragastos.data.entities.Usuario
 import android.content.Context
@@ -19,12 +21,14 @@ import androidx.room.RoomDatabase
     Gasto::class,
     Ingreso::class,
     Categoria::class,
-    Tarjeta::class], version = 3, exportSchema = false)
+    Tarjeta::class,
+    Presupuesto::class], version = 4, exportSchema = false)
 abstract class SpentDatabase : RoomDatabase(){
     abstract fun usuarioDao(): UsuarioDao
     abstract fun gastoDao(): GastoDao
     abstract fun ingresoDao(): IngresoDao
     abstract fun categoriaDao(): CategoriaDao
+    abstract fun presupuestoDao(): PresupuestoDao
 
     companion object {
         @Volatile

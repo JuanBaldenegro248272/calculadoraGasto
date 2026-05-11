@@ -3,6 +3,7 @@ package LosPrimos.Durango.calculadoragastos.navigation
 import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
 import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
+import LosPrimos.Durango.calculadoragastos.data.repositories.PresupuestoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
@@ -20,6 +21,7 @@ import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PerfilViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
@@ -87,6 +89,7 @@ fun AppNavigationController(
     val gastoViewModel: GastoViewModel = viewModel(factory = factory)
     val ingresoViewModel: IngresoViewModel = viewModel(factory = factory)
     val categoriaViewModel: CategoriaViewModel = viewModel(factory = factory)
+    val presupuestoViewModel: PresupuestoViewModel = viewModel(factory = factory)
 
     LaunchedEffect(Unit) {
         categoriaViewModel.insertarCategorias()
@@ -154,6 +157,8 @@ fun AppNavigationController(
 
         composable(Screen.Presupuestos.route) {
             PresupuestosScreen(
+                presupuestoViewModel = presupuestoViewModel,
+                gastoViewModel = gastoViewModel,
                 onNavigate = { ruta ->
                     navController.navigate(ruta) {
                         launchSingleTop = true

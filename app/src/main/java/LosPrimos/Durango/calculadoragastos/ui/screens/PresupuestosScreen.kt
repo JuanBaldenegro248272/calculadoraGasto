@@ -15,22 +15,67 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import LosPrimos.Durango.calculadoragastos.data.entities.Presupuesto
 import LosPrimos.Durango.calculadoragastos.ui.components.*
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
+import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
 
 @Composable
 fun PresupuestosScreen(
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    presupuestoViewModel: PresupuestoViewModel,
+    gastoViewModel: GastoViewModel
 ) {
     var isCategoriaSelected by remember { mutableStateOf(true) }
     var showAddGastoDialog by remember { mutableStateOf(false) }
     var showAddIngresoDialog by remember { mutableStateOf(false) }
+    val usuarioActualId by presupuestoViewModel.usuarioActualId.collectAsState()
+    val usuarioId = usuarioActualId ?: 0
 
-    val ingresosFijosTotales = 15000.0
-    val gastosFijosTotales = 4500.0
+    val presupuestos by presupuestoViewModel
+        .obtenerPresupuesto(usuarioId)
+        .collectAsState(initial = emptyList())
+
+    val gastos by gastoViewModel
+        .obtenerGastosPorUsuario(usuarioId)
+        .collectAsState(initial = emptyList())
+
+    val ingresosFijosTotales = 0.0
+    val gastosFijosTotales = 0.0
     val disponibleFijo = ingresosFijosTotales - gastosFijosTotales
-    val presupuestoAsignadoTotal = 10000.0
-    val presupuestoGastado = 6500.0
+    val presupuestoAsignadoTotal = presupuestos.sumOf { it.monto }
+    val presupuestoGastado = gastos.sumOf { gasto ->
+        if (presupuestos.any { presupuesto -> presupuesto.idCategoria == gasto.idCategoria }) {
+            gasto.monto
+        } else {
+            0.0
+        }
+    }
+    val presupuestoVivienda = presupuestos.find { it.idCategoria == 1 }
+    val montoPresupuestoVivienda = presupuestoVivienda?.monto ?: 0.0
+    val gastadoVivienda = gastos.filter { it.idCategoria == 1 }.sumOf { it.monto }
+
+    val presupuestoEntretenimiento = presupuestos.find { it.idCategoria == 2 }
+    val montoPresupuestoEntretenimiento = presupuestoEntretenimiento?.monto ?: 0.0
+    val gastadoEntretenimiento = gastos.filter { it.idCategoria == 2 }.sumOf { it.monto }
+
+    val presupuestoTransporte = presupuestos.find { it.idCategoria == 3 }
+    val montoPresupuestoTransporte = presupuestoTransporte?.monto ?: 0.0
+    val gastadoTransporte = gastos.filter { it.idCategoria == 3 }.sumOf { it.monto }
+
+    val presupuestoAlimentacion = presupuestos.find { it.idCategoria == 4 }
+    val montoPresupuestoAlimentacion = presupuestoAlimentacion?.monto ?: 0.0
+    val gastadoAlimentacion = gastos.filter { it.idCategoria == 4 }.sumOf { it.monto }
+
+    val presupuestoSalud = presupuestos.find { it.idCategoria == 5 }
+    val montoPresupuestoSalud = presupuestoSalud?.monto ?: 0.0
+    val gastadoSalud = gastos.filter { it.idCategoria == 5 }.sumOf { it.monto }
+
+    val presupuestoOtros = presupuestos.find { it.idCategoria == 6 }
+    val montoPresupuestoOtros = presupuestoOtros?.monto ?: 0.0
+    val gastadoOtros = gastos.filter { it.idCategoria == 6 }.sumOf { it.monto }
+
 
     Scaffold(
         bottomBar = {
@@ -109,29 +154,140 @@ fun PresupuestosScreen(
                         if (isCategoriaSelected) {
                             item {
                                 CategoryBudgetCard(
-                                    nombreCategoria = "Transporte",
-                                    gastado = 800.0,
-                                    presupuestoAsignado = 1500.0,
+                                    nombreCategoria = "Vivienda",
+                                    gastado = gastadoVivienda,
+                                    presupuestoAsignado = montoPresupuestoVivienda,
                                     alertasActivadas = true,
-                                    onSaveConfig = { monto, alertas -> }
+                                    onSaveConfig = { monto, alertas ->
+                                        if (usuarioId != 0) {
+                                            val nuevoPresupuesto = Presupuesto(
+                                                idPresupuesto = presupuestoVivienda?.idPresupuesto ?: 0,
+                                                monto = monto,
+                                                mes = 5,
+                                                anio = 2026,
+                                                porcentaje = if (alertas) 1 else 0,
+                                                idUsuario = usuarioId,
+                                                idCategoria = 1
+                                            )
+
+                                            presupuestoViewModel.insertarPresupuesto(nuevoPresupuesto)
+                                        }
+                                    }
+                                )
+                            }
+                            item {
+                                CategoryBudgetCard(
+                                    nombreCategoria = "Transporte",
+                                    gastado = gastadoTransporte,
+                                    presupuestoAsignado = montoPresupuestoTransporte,
+                                    alertasActivadas = true,
+                                    onSaveConfig = { monto, alertas ->
+                                        if (usuarioId != 0) {
+                                            val nuevoPresupuesto = Presupuesto(
+                                                idPresupuesto = presupuestoTransporte?.idPresupuesto ?: 0,
+                                                monto = monto,
+                                                mes = 5,
+                                                anio = 2026,
+                                                porcentaje = if (alertas) 1 else 0,
+                                                idUsuario = usuarioId,
+                                                idCategoria = 3
+                                            )
+
+                                            presupuestoViewModel.insertarPresupuesto(nuevoPresupuesto)
+                                        }
+                                    }
                                 )
                             }
                             item {
                                 CategoryBudgetCard(
                                     nombreCategoria = "Alimentación",
-                                    gastado = 4500.0,
-                                    presupuestoAsignado = 5000.0,
+                                    gastado = gastadoAlimentacion,
+                                    presupuestoAsignado = montoPresupuestoAlimentacion,
                                     alertasActivadas = true,
-                                    onSaveConfig = { monto, alertas -> }
+                                    onSaveConfig = { monto, alertas ->
+                                        if (usuarioId != 0) {
+                                            val nuevoPresupuesto = Presupuesto(
+                                                idPresupuesto = presupuestoAlimentacion?.idPresupuesto ?: 0,
+                                                monto = monto,
+                                                mes = 5,
+                                                anio = 2026,
+                                                porcentaje = if (alertas) 1 else 0,
+                                                idUsuario = usuarioId,
+                                                idCategoria = 4
+                                            )
+
+                                            presupuestoViewModel.insertarPresupuesto(nuevoPresupuesto)
+                                        }
+                                    }
                                 )
                             }
                             item {
                                 CategoryBudgetCard(
                                     nombreCategoria = "Entretenimiento",
-                                    gastado = 1200.0,
-                                    presupuestoAsignado = 1000.0,
+                                    gastado = gastadoEntretenimiento,
+                                    presupuestoAsignado = montoPresupuestoEntretenimiento,
                                     alertasActivadas = false,
-                                    onSaveConfig = { monto, alertas ->  }
+                                    onSaveConfig = { monto, alertas ->
+                                        if (usuarioId != 0) {
+                                            val nuevoPresupuesto = Presupuesto(
+                                                idPresupuesto = presupuestoEntretenimiento?.idPresupuesto ?: 0,
+                                                monto = monto,
+                                                mes = 5,
+                                                anio = 2026,
+                                                porcentaje = if (alertas) 1 else 0,
+                                                idUsuario = usuarioId,
+                                                idCategoria = 2
+                                            )
+
+                                            presupuestoViewModel.insertarPresupuesto(nuevoPresupuesto)
+                                        }
+                                    }
+                                )
+                            }
+                            item {
+                                CategoryBudgetCard(
+                                    nombreCategoria = "Salud",
+                                    gastado = gastadoSalud,
+                                    presupuestoAsignado = montoPresupuestoSalud,
+                                    alertasActivadas = true,
+                                    onSaveConfig = { monto, alertas ->
+                                        if (usuarioId != 0) {
+                                            val nuevoPresupuesto = Presupuesto(
+                                                idPresupuesto = presupuestoSalud?.idPresupuesto ?: 0,
+                                                monto = monto,
+                                                mes = 5,
+                                                anio = 2026,
+                                                porcentaje = if (alertas) 1 else 0,
+                                                idUsuario = usuarioId,
+                                                idCategoria = 5
+                                            )
+
+                                            presupuestoViewModel.insertarPresupuesto(nuevoPresupuesto)
+                                        }
+                                    }
+                                )
+                            }
+                            item {
+                                CategoryBudgetCard(
+                                    nombreCategoria = "Otros",
+                                    gastado = gastadoOtros,
+                                    presupuestoAsignado = montoPresupuestoOtros,
+                                    alertasActivadas = true,
+                                    onSaveConfig = { monto, alertas ->
+                                        if (usuarioId != 0) {
+                                            val nuevoPresupuesto = Presupuesto(
+                                                idPresupuesto = presupuestoOtros?.idPresupuesto ?: 0,
+                                                monto = monto,
+                                                mes = 5,
+                                                anio = 2026,
+                                                porcentaje = if (alertas) 1 else 0,
+                                                idUsuario = usuarioId,
+                                                idCategoria = 6
+                                            )
+
+                                            presupuestoViewModel.insertarPresupuesto(nuevoPresupuesto)
+                                        }
+                                    }
                                 )
                             }
                         } else {

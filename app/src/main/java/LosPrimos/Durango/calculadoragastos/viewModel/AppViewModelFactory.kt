@@ -4,6 +4,7 @@ import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
 import LosPrimos.Durango.calculadoragastos.data.repositories.CategoriaRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.IngresoRepository
+import LosPrimos.Durango.calculadoragastos.data.repositories.PresupuestoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -13,7 +14,8 @@ class AppViewModelFactory(
     private val usuarioRepository: UsuarioRepository,
     private val dataStoreManager: DataStoreManager,
     private val ingresoRepository: IngresoRepository,
-    private val categoriaRepository: CategoriaRepository
+    private val categoriaRepository: CategoriaRepository,
+    private val presupuestoRepository: PresupuestoRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -33,6 +35,9 @@ class AppViewModelFactory(
         }
         if (modelClass.isAssignableFrom(CategoriaViewModel::class.java)){
             return CategoriaViewModel(categoriaRepository) as T
+        }
+        if (modelClass.isAssignableFrom(PresupuestoViewModel::class.java)){
+            return PresupuestoViewModel(presupuestoRepository, dataStoreManager) as T
         }
         throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     }

@@ -19,6 +19,6 @@ class PresupuestoRepository(private val presupuestoDao: PresupuestoDao){
     }
 
     fun obtenerPresupuestos(idUsuario: Int): Flow<List<Presupuesto>> {
-        return presupuestoDao.getPresupuestosPorUsuario(idUsuario)
+        return presupuestoDao.obtenerPresupuestosPorUsuario(idUsuario)
     }
 }

@@ -5,6 +5,7 @@ import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
 import LosPrimos.Durango.calculadoragastos.data.repositories.CategoriaRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.IngresoRepository
+import LosPrimos.Durango.calculadoragastos.data.repositories.PresupuestoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import LosPrimos.Durango.calculadoragastos.navigation.AppNavigationController
 import android.os.Bundle
@@ -36,13 +37,15 @@ class MainActivity : AppCompatActivity() {
         val dataStoreManager = DataStoreManager(applicationContext)
         val ingresoRepository = IngresoRepository(database.ingresoDao())
         val categoriaRepository = CategoriaRepository(database.categoriaDao())
+        val presupuestoRepository = PresupuestoRepository(database.presupuestoDao())
 
         val appViewModelFactory = AppViewModelFactory(
             gastoRepository = gastoRepository,
             usuarioRepository = usuarioRepository,
             dataStoreManager = dataStoreManager,
             ingresoRepository = ingresoRepository,
-            categoriaRepository = categoriaRepository
+            categoriaRepository = categoriaRepository,
+            presupuestoRepository = presupuestoRepository
         )
 
         setContent {
