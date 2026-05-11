@@ -162,7 +162,7 @@ fun LoginScreen(
                         Icon(Icons.Outlined.Lock, contentDescription = null, tint = Color.Gray)
                     }
                 )
-                
+
                 if (Helper.isDisponible()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

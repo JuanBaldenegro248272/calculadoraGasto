@@ -25,6 +25,7 @@ import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import java.text.NumberFormat
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -132,13 +133,25 @@ fun HomeScreen(
 
                 val totalIngresos = ingresos.sumOf { it.monto }
                 val totalGastos = gastos.sumOf { it.monto }
+                val presupuestoMensual = 10000.0
+                val proporcionPresupuesto = if (presupuestoMensual > 0) {
+                    (totalGastos / presupuestoMensual).toFloat()
+                } else {
+                    0f
+                }
+
+                val progresoBarra = proporcionPresupuesto.coerceIn(0f, 1f)
+                val porcentajeTexto = String.format("%.1f", proporcionPresupuesto * 100)
+                val formatoDinero = NumberFormat.getCurrencyInstance()
+                val gastosFormateado = formatoDinero.format(totalGastos)
+                val presupuestoFormateado = formatoDinero.format(presupuestoMensual)
 
                 BalanceSummarySection(
                     ingresos = totalIngresos,
                     gastos = totalGastos,
                     balance = totalIngresos - totalGastos,
-                    presupuestoUtilizado = 0.716f,
-                    textoPresupuesto = "71.6% del presupuesto utilizado ($2,000 / $10,000)"
+                    presupuestoUtilizado = progresoBarra,
+                    textoPresupuesto = "$porcentajeTexto% del presupuesto utilizado ($gastosFormateado / $presupuestoFormateado)"
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
