@@ -21,12 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
 import LosPrimos.Durango.calculadoragastos.ui.components.*
+import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import java.text.NumberFormat
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -36,15 +38,51 @@ fun HomeScreen(
     gastoViewModel: GastoViewModel,
     ingresoViewModel: IngresoViewModel,
     onNavigate: (String) -> Unit,
+    categoriaViewModel: CategoriaViewModel
 ) {
     val usuarioActualId by ingresoViewModel.usuarioActualId.collectAsState()
     val ingresos by ingresoViewModel.obtenerIngresosPorUsuario(usuarioActualId).collectAsState(initial = emptyList())
     val gastos by gastoViewModel.obtenerGastosPorUsuario(usuarioActualId).collectAsState(initial = emptyList())
+    val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
+    val nombresCategorias = listOf("Todas") + categorias.map { it.nombre }
+
+    val mesesMapReverso = mapOf(
+        1 to "Enero", 2 to "Febrero", 3 to "Marzo", 4 to "Abril",
+        5 to "Mayo", 6 to "Junio", 7 to "Julio", 8 to "Agosto",
+        9 to "Septiembre", 10 to "Octubre", 11 to "Noviembre", 12 to "Diciembre"
+    )
+    val mesActualTexto = remember { mesesMapReverso[LocalDate.now().monthValue] ?: "Todos" }
+
+    var mesSeleccionado by remember { mutableStateOf(mesActualTexto) }
+
+
     var isGastosSelected by remember { mutableStateOf(true) }
-    var mesSeleccionado by remember { mutableStateOf("Abril") }
     var showFabMenu by remember { mutableStateOf(false) }
     val isOffline = true
     var categoriaSeleccionada by remember { mutableStateOf("Todas") }
+
+
+    val mesesMap = mapOf(
+        "Enero" to 1, "Febrero" to 2, "Marzo" to 3, "Abril" to 4,
+        "Mayo" to 5, "Junio" to 6, "Julio" to 7, "Agosto" to 8,
+        "Septiembre" to 9, "Octubre" to 10, "Noviembre" to 11, "Diciembre" to 12
+    )
+
+
+    val gastosFiltrados = gastos.filter { gasto ->
+        val date = Instant.ofEpochMilli(gasto.fecha).atZone(ZoneId.systemDefault()).toLocalDate()
+        val matchMes = if (mesSeleccionado == "Todos") true else date.monthValue == mesesMap[mesSeleccionado]
+
+        val nombreCat = categorias.find { it.idCategoria == gasto.idCategoria }?.nombre ?: "Otros"
+        val matchCat = if (categoriaSeleccionada == "Todas") true else nombreCat == categoriaSeleccionada
+
+        matchMes && matchCat
+    }
+
+    val ingresosFiltrados = ingresos.filter { ingreso ->
+        val date = Instant.ofEpochMilli(ingreso.fecha).atZone(ZoneId.systemDefault()).toLocalDate()
+        if (mesSeleccionado == "Todos") true else date.monthValue == mesesMap[mesSeleccionado]
+    }
 
 
     Scaffold(
@@ -79,7 +117,7 @@ fun HomeScreen(
 
                         ExtendedFloatingActionButton(
                             onClick = { showFabMenu = false
-                                onNavigate(Screen.AgregarGasto.createRoute())}, //es create route porque no lleva id de algun grupo
+                                onNavigate(Screen.AgregarGasto.createRoute())},
                             containerColor = MagentaPink,
                             contentColor = Color.White
                         ) {
@@ -169,7 +207,8 @@ fun HomeScreen(
                             mesSeleccionado = mesSeleccionado,
                             onMesSeleccionado = { mesSeleccionado = it },
                             categoriaSeleccionada = categoriaSeleccionada,
-                            onCategoriaSeleccionada = { categoriaSeleccionada = it }
+                            onCategoriaSeleccionada = { categoriaSeleccionada = it },
+                            listaCategoriasNombres = nombresCategorias
                         )
 
                         LazyColumn(
@@ -184,24 +223,39 @@ fun HomeScreen(
                             }
 
                             if (isGastosSelected) {
-                                item {
-                                    gastos.forEach { gasto ->
-                                        TransactionItem(
-                                            gasto.descripcion,
-                                            formatoFecha(gasto.fecha),
-                                            gasto.monto,
-                                            true
-                                            )
+                                val gastosAgrupados = gastosFiltrados.groupBy { gasto ->
+                                    categorias.find { it.idCategoria == gasto.idCategoria }?.nombre ?: "Otros"
+                                }
+
+                                gastosAgrupados.forEach { (nombreCategoria, listaGastos) ->
+                                    item {
+                                        CategoryGroup(
+                                            nombreCategoria = nombreCategoria,
+                                            iconoCategoria = null
+                                        ) {
+                                            listaGastos.forEach { gasto ->
+                                                TransactionItem(
+                                                    titulo = gasto.descripcion,
+                                                    fecha = formatoFecha(gasto.fecha),
+                                                    monto = gasto.monto,
+                                                    isGasto = true
+                                                )
+                                            }
                                         }
+                                    }
+                                }
+                                if (gastosFiltrados.isEmpty()) {
+                                    item { Text("No hay gastos en este mes/categoría", modifier = Modifier.padding(16.dp)) }
                                 }
                             } else {
                                 item {
-                                    ingresos.forEach { ingreso ->
-                                        TransactionItem(
-                                            ingreso.descripcion,
-                                            formatoFecha(ingreso.fecha),
-                                                ingreso.monto,
-                                            false
+                                    CategoryGroup("Ingresos", Icons.Default.ArrowUpward) {
+                                        ingresosFiltrados.forEach { ingreso ->
+                                            TransactionItem(
+                                                titulo = ingreso.descripcion,
+                                                fecha = formatoFecha(ingreso.fecha),
+                                                monto = ingreso.monto,
+                                                isGasto = false
                                             )
                                         }
                                     }
@@ -213,7 +267,7 @@ fun HomeScreen(
             }
         }
     }
-
+}
 @RequiresApi(Build.VERSION_CODES.O)
 fun formatoFecha(fecha: Long): String{
     val formato = DateTimeFormatter.ofPattern("dd MMM yyyy")

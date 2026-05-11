@@ -3,12 +3,18 @@ package LosPrimos.Durango.calculadoragastos.ui.screens
 import LosPrimos.Durango.calculadoragastos.data.entities.Categoria
 import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.data.enums.TipoPago
+import LosPrimos.Durango.calculadoragastos.ui.components.FormDateField
 import LosPrimos.Durango.calculadoragastos.ui.components.GradientFormBackground
 import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
+import LosPrimos.Durango.calculadoragastos.utils.obtenerUbicacionGPS
+import LosPrimos.Durango.calculadoragastos.utils.saveImageToInternalStorage
 import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
+import android.net.Uri
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
@@ -25,19 +31,25 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,14 +59,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.google.android.gms.location.LocationServices
 import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import android.Manifest
+
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -67,8 +84,47 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
     var monto by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var metodoPago by remember { mutableStateOf("Efectivo") }
-    var fecha by remember { mutableStateOf(LocalDate.now().format(formato))
+    var fechaLong by remember {
+        mutableStateOf(LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
     }
+
+    val context = LocalContext.current
+    var fotoUri by remember { mutableStateOf<Uri?>(null) }
+    var lugar by remember { mutableStateOf("") }
+    var isLoadingLocation by remember { mutableStateOf(false) }
+
+    val fusedLocationClient = remember { LocationServices.getFusedLocationProviderClient(context) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        fotoUri = uri
+    }
+
+    val locationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val granted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        if (granted) {
+            isLoadingLocation = true
+            lugar = "Buscando satélites..."
+            obtenerUbicacionGPS(context, fusedLocationClient) { direccion ->
+                lugar = direccion
+                isLoadingLocation = false
+            }
+        } else {
+            lugar = "Permiso denegado"
+            isLoadingLocation = false
+        }
+    }
+
+    LaunchedEffect(categorias) {
+        if (categorias.isNotEmpty() && categoriaSeleccionada == null) {
+            categoriaSeleccionada = categorias.first()
+        }
+    }
+
 
     GradientFormBackground(
         title = "Nuevo Gasto",
@@ -215,60 +271,34 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
                 )
             }
 
-            Text(
-                text = "Fecha",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp,
-                color = Color.Black
+
+            FormDateField(
+                label = "Fecha",
+                fechaMilisegundos = fechaLong,
+                onDateSelected = { fechaLong = it }
             )
-            OutlinedTextField(
-                value = fecha,
-                onValueChange = { fecha = it },
-                placeholder = {
-                    Text(
-                        text = fecha.toString(),
-                        color = Color(0xFF4D4D5C),
-                        fontSize = 14.sp
+
+            Text(text = "Ubicacion (Opcional)", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+
+            BotonAccion(
+                texto = if (isLoadingLocation) "Buscando satélites..." else if (lugar.isNotEmpty()) lugar.take(30) + "..." else "Capturar Ubicacion Actual",
+                icono = if (lugar.isNotEmpty() && !isLoadingLocation && lugar != "Permiso denegado") Icons.Default.CheckCircle else Icons.Outlined.LocationOn,
+                onClick = {
+                    locationPermissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        )
                     )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(58.dp),
-                shape = RoundedCornerShape(7.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = TealDark,
-                    unfocusedIndicatorColor = Color(0xFFC8C2D2),
-                    focusedTextColor = Color(0xFF363645),
-                    unfocusedTextColor = Color(0xFF363645),
-                    cursorColor = TealDark
-                )
+                }
             )
 
-            Text(
-                text = "Ubicacion (Opcional)",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            BotonAccion(
-                texto = "Capturar Ubicacion",
-                icono = Icons.Outlined.LocationOn,
-                onClick = {}
-            )
+            Text(text = "Foto del Recibo (Opcional)", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
 
-            Text(
-                text = "Foto del Recibo (Opcional)",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
             BotonAccion(
-                texto = "Subir Foto",
-                icono = Icons.Outlined.FileUpload,
-                onClick = {}
+                texto = if (fotoUri != null) "Foto adjuntada" else "Subir Foto",
+                icono = if (fotoUri != null) Icons.Default.CheckCircle else Icons.Outlined.FileUpload,
+                onClick = { galleryLauncher.launch("image/*") }
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -284,21 +314,23 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
                         return@Button
                     }
 
-                    val localDate = LocalDate.parse(fecha, formato)
-                    val fechaLong = localDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli()
+                    val uriFinal = if (fotoUri != null) {
+                        saveImageToInternalStorage(context, fotoUri!!)
+                    } else null
+
 
                     val nuevoGasto = Gasto(
                         idGasto = 0,
                         idUsuarioPaga = usuarioActualId!!,
-                        idCategoria = null,
+                        idCategoria = categoriaSeleccionada?.idCategoria,
                         idGrupo = null,
                         idTarjeta = null,
-                        monto = monto.toDoubleOrNull() ?: 0.0, // Ver nota extra abajo
+                        monto = monto.toDoubleOrNull() ?: 0.0,
                         descripcion = descripcion,
                         fecha = fechaLong,
                         tipoPago = if (metodoPago == "Efectivo") TipoPago.EFECTIVO else TipoPago.TARJETA,
-                        lugar = "",
-                        fotoRecibo = null
+                        lugar = lugar,
+                        fotoRecibo = uriFinal?.toString()
                     )
                     gastoviewModel.insertarGasto(nuevoGasto)
                     onBack()
@@ -320,6 +352,48 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
             }
 
             Spacer(modifier = Modifier.height(24.dp))
+        }
+    }
+}
+
+@Composable
+fun LocationInputDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var ubicacion by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text("Añadir Ubicación", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.Black)
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
+                    value = ubicacion,
+                    onValueChange = { ubicacion = it },
+                    placeholder = { Text("Ej. Walmart, Restaurante...") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = TealDark,
+                        unfocusedBorderColor = Color.Gray
+                    )
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    TextButton(onClick = onDismiss) { Text("Cancelar", color = Color.Gray) }
+                    Button(
+                        onClick = { onConfirm(ubicacion) },
+                        colors = ButtonDefaults.buttonColors(containerColor = TealDark)
+                    ) { Text("Guardar", color = Color.White) }
+                }
+            }
         }
     }
 }

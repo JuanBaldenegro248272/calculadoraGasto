@@ -122,6 +122,7 @@ fun AppNavigationController(
             HomeScreen(
                 gastoViewModel = gastoViewModel,
                 ingresoViewModel = ingresoViewModel,
+                categoriaViewModel = categoriaViewModel,
                 onNavigate = {
                     rutaDestino ->
                     navController.navigate(rutaDestino) {

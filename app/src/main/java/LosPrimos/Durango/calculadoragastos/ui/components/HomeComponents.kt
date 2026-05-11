@@ -15,9 +15,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
+import android.R.attr.timeZone
+import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
+import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
+import androidx.compose.ui.platform.LocalLocale
 
 
 @Composable
@@ -239,10 +252,10 @@ fun TransactionsFilterSection(
     mesSeleccionado: String,
     onMesSeleccionado: (String) -> Unit,
     categoriaSeleccionada: String,
-    onCategoriaSeleccionada: (String) -> Unit
+    onCategoriaSeleccionada: (String) -> Unit,
+    listaCategoriasNombres: List<String>
 ) {
     val meses = listOf("Todos", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre")
-    val categorias = listOf("Todas", "Salud", "Alimentacion", "Transporte", "Entretenimiento")
 
     Column(
         modifier = Modifier
@@ -274,7 +287,7 @@ fun TransactionsFilterSection(
             if (isGastosSelected) {
                 CustomDropdownSelector(
                     label = "Categoría",
-                    items = categorias,
+                    items = listaCategoriasNombres,
                     selectedItem = categoriaSeleccionada,
                     onItemSelected = onCategoriaSeleccionada
                 )
@@ -436,6 +449,70 @@ fun OfflineListWarning() {
                     lineHeight = 16.sp
                 )
             }
+        }
+    }
+}
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalTime::class)
+@Composable
+fun FormDateField(
+    label: String,
+    fechaMilisegundos: Long,
+    onDateSelected: (Long) -> Unit
+) {
+    var showDialog by remember { mutableStateOf(false) }
+
+    val sdf = SimpleDateFormat("dd/MM/yyyy", LocalLocale.current.platformLocale).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
+    }
+    val fechaFormateada = if (fechaMilisegundos > 0L) sdf.format(Date(fechaMilisegundos)) else "Seleccionar fecha"
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+        Spacer(modifier = Modifier.height(7.dp))
+        Box(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = fechaFormateada,
+                onValueChange = {},
+                readOnly = true,
+                modifier = Modifier.fillMaxWidth().height(58.dp),
+                shape = RoundedCornerShape(7.dp),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = Color.White,
+                    unfocusedContainerColor = Color.White,
+                    focusedIndicatorColor = TealDark,
+                    unfocusedIndicatorColor = Color(0xFFC8C2D2),
+                    focusedTextColor = Color(0xFF363645),
+                    unfocusedTextColor = Color(0xFF363645)
+                )
+            )
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable { showDialog = true }
+                    .background(Color.Transparent)
+            )
+        }
+    }
+
+    if (showDialog) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = fechaMilisegundos)
+        DatePickerDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { onDateSelected(it) }
+                    showDialog = false
+                }) { Text("Aceptar", color = TealDark) }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) { Text("Cancelar", color = DarkGrayText) }
+            },
+            colors = DatePickerDefaults.colors(containerColor = Color.White)
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 }
