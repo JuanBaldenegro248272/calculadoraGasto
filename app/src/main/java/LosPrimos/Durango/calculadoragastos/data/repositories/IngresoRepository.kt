@@ -25,6 +25,10 @@ class IngresoRepository(private val ingresoDao: IngresoDao){
         return ingresoDao.getIngresosByUsuario(idUsuario)
     }
 
+    fun obtenerIngresosFijosPorUsuario(idUsuario: Int): Flow<List<Ingreso>> {
+        return ingresoDao.getIngresosFijosByUsuario(idUsuario)
+    }
+
      fun obtenerSumaIngresos(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?> =
         ingresoDao.getSumaIngresosPorPeriodo(idUsuario, inicio, fin)
 

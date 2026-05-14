@@ -26,5 +26,6 @@ data class Ingreso(
     val idCategoria: Int?,
     val idUsuario: Int?,
     val lugar: String?,
-    val fotoRecibo: String?
+    val fotoRecibo: String?,
+    val esFijo: Boolean = false,
 )

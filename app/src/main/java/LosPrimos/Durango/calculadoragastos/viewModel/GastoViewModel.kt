@@ -39,4 +39,8 @@ class GastoViewModel(private val repository: GastoRepository, private val dataSt
     fun obtenerGastosPorUsuario(usuarioId: Int?): Flow<List<Gasto>> {
         return repository.obtenerListagastosPorUsuario(usuarioId ?: 0)
     }
+
+    fun obtenerGastosFijosPorUsuario(usuarioId: Int?): Flow<List<Gasto>> {
+        return repository.obtenerListagastosFijosPorUsuario(usuarioId ?: 0)
+    }
 }

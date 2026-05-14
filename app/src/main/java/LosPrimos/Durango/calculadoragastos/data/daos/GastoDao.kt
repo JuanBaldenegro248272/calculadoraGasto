@@ -24,4 +24,7 @@ interface GastoDao {
     fun getGastosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Gasto>>
     @Query("SELECT * FROM gastos WHERE idGrupo = :idGrupo ORDER BY fecha DESC")
     fun getGastosByGrupo(idGrupo: Int): Flow<List<Gasto>>
+
+    @Query("SELECT * FROM gastos WHERE idUsuarioPaga = :idUsuario AND esFijo = 1 ORDER BY fecha DESC")
+    fun getGastosFijosByUsuario(idUsuario: Int): Flow<List<Gasto>>
 }

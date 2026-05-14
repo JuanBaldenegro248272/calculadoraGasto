@@ -19,19 +19,26 @@ import LosPrimos.Durango.calculadoragastos.data.entities.Presupuesto
 import LosPrimos.Durango.calculadoragastos.ui.components.*
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
 
 @Composable
 fun PresupuestosScreen(
     onNavigate: (String) -> Unit,
     presupuestoViewModel: PresupuestoViewModel,
-    gastoViewModel: GastoViewModel
+    gastoViewModel: GastoViewModel,
+    ingresoViewModel: IngresoViewModel
 ) {
+
     var isCategoriaSelected by remember { mutableStateOf(true) }
     var showAddGastoDialog by remember { mutableStateOf(false) }
     var showAddIngresoDialog by remember { mutableStateOf(false) }
     val usuarioActualId by presupuestoViewModel.usuarioActualId.collectAsState()
     val usuarioId = usuarioActualId ?: 0
+
+    val gastosFijos by gastoViewModel.obtenerGastosFijosPorUsuario(usuarioId).collectAsState(initial = emptyList())
+    val ingresosFijos by ingresoViewModel.obtenerIngresosFijosPorUsuario(usuarioId).collectAsState(initial = emptyList())
+
 
     val presupuestos by presupuestoViewModel
         .obtenerPresupuesto(usuarioId)
@@ -41,8 +48,8 @@ fun PresupuestosScreen(
         .obtenerGastosPorUsuario(usuarioId)
         .collectAsState(initial = emptyList())
 
-    val ingresosFijosTotales = 0.0
-    val gastosFijosTotales = 0.0
+    val ingresosFijosTotales = ingresosFijos.sumOf { it.monto }
+    val gastosFijosTotales = gastosFijos.sumOf { it.monto }
     val disponibleFijo = ingresosFijosTotales - gastosFijosTotales
     val presupuestoAsignadoTotal = presupuestos.sumOf { it.monto }
     val presupuestoGastado = gastos.sumOf { gasto ->
@@ -305,9 +312,14 @@ fun PresupuestosScreen(
                                     nombreCategoria = "Gastos Fijos ($-${gastosFijosTotales})",
                                     iconoCategoria = Icons.Default.ArrowDownward
                                 ) {
-                                    TransactionItem(titulo = "Renta Departamento", fecha = "Día 1 de cada mes", monto = 3500.0, isGasto = true)
-                                    TransactionItem(titulo = "Recibo de Internet", fecha = "Día 12 de cada mes", monto = 500.0, isGasto = true)
-                                    TransactionItem(titulo = "Suscripción Spotify", fecha = "Día 5 de cada mes", monto = 500.0, isGasto = true)
+                                    gastosFijos.forEach { gastoFijo ->
+                                        TransactionItem(
+                                            titulo = gastoFijo.descripcion,
+                                            fecha = "null",
+                                            monto = gastoFijo.monto,
+                                            isGasto = true
+                                        )
+                                    }
                                 }
 
                                 Spacer(modifier = Modifier.height(24.dp))

@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.viewModel
 
 import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
+import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
 import LosPrimos.Durango.calculadoragastos.data.repositories.IngresoRepository
 import androidx.lifecycle.ViewModel
@@ -38,5 +39,9 @@ class IngresoViewModel(private val repository: IngresoRepository, dataStore: Dat
 
     fun obtenerIngresosPorUsuario(idUsuario: Int?): Flow<List<Ingreso>> {
             return repository.obtenerIngresosPorUsuario(idUsuario ?: 0)
+    }
+
+    fun obtenerIngresosFijosPorUsuario(usuarioId: Int?): Flow<List<Ingreso>> {
+        return repository.obtenerIngresosFijosPorUsuario(usuarioId ?: 0)
     }
 }

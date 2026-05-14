@@ -53,5 +53,6 @@ data class Gasto(
     val fecha: Long,
     val tipoPago: TipoPago,
     val lugar: String,
-    val fotoRecibo: String?
+    val fotoRecibo: String?,
+    val esFijo: Boolean = false
 )

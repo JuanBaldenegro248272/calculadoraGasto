@@ -144,23 +144,6 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel,
                 )
             )
 
-            Text(text = "Categoria", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth().height(36.dp),
-                shape = RoundedCornerShape(8.dp),
-                border = BorderStroke(1.dp, Color(0xFFE0E0E0)),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = Color(0xFFFDFDFD),
-                    contentColor = Color(0xFF202124)
-                )
-            ) {
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "No Fijo", fontSize = 13.sp)
-                    Spacer(modifier = Modifier.weight(1f))
-                    Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = "Seleccionar categoria", modifier = Modifier.size(18.dp))
-                }
-            }
 
             Text(text = "Descripcion", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
             OutlinedTextField(

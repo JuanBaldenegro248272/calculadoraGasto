@@ -25,6 +25,10 @@ class GastoRepository (private val gastoDao: GastoDao){
         return gastoDao.getGastosByUsuario(idUsuario)
     }
 
+    fun obtenerListagastosFijosPorUsuario(idUsuario: Int): Flow<List<Gasto>> {
+        return gastoDao.getGastosFijosByUsuario(idUsuario)
+    }
+
      fun obtenergastosPorGrupo(idGrupo: Int): Flow<List<Gasto>>{
         return gastoDao.getGastosByGrupo(idGrupo)
     }
