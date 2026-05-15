@@ -183,17 +183,16 @@ fun AppNavigationController(
                 }
             )
         }
-
-        composable(Screen.Graficas.route) {
+        composable("graficas") {
             GraficasScreen(
-                onNavigate = { rutaDestino ->
-                    navController.navigate(rutaDestino) {
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                }
+                onNavigate       = { navController.navigate(it) },
+                gastoViewModel   = gastoViewModel,
+                ingresoViewModel = ingresoViewModel,
+                presupuestoViewModel = presupuestoViewModel,
+                categoriaViewModel   = categoriaViewModel
             )
         }
+
 
         composable(Screen.Presupuestos.route) {
             PresupuestosScreen(

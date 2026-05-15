@@ -11,6 +11,9 @@ val DarkGrayText = Color(0xFF373B3E)
 val LightBlueGray = Color(0xFFBEC8D1)
 
 // Colores de estructura
+
+val ViviendaColor        = Color(0xFF5C6BC0)
+val EntretenimientoColor = Color(0xFFAB47BC)
 val BackgroundLight = Color(0xFFF5F7F9)
 val SurfaceWhite = Color(0xFFFFFFFF)
 val BackgroundDark = Color(0xFF121212)
