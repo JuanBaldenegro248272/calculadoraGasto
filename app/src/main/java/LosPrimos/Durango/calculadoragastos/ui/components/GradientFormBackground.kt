@@ -44,7 +44,6 @@ fun GradientFormBackground(
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding()
-                .verticalScroll(rememberScrollState())
         ) {
             Row(
                 modifier = Modifier
@@ -73,6 +72,7 @@ fun GradientFormBackground(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
                     .padding(start = 12.dp, end = 12.dp, bottom = 8.dp),
                 color = Color.White,
                 shape = RoundedCornerShape(34.dp),
