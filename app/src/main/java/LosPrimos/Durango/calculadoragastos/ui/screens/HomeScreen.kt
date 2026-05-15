@@ -1,5 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
+import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
+import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
 import LosPrimos.Durango.calculadoragastos.navigation.Screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -28,6 +30,7 @@ import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.clickable
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.LocalDate
@@ -66,6 +69,9 @@ fun HomeScreen(
     var showFabMenu by remember { mutableStateOf(false) }
     val isOffline = true
     var categoriaSeleccionada by remember { mutableStateOf("Todas") }
+
+    var gastoSeleccionado by remember { mutableStateOf<Gasto?>(null) }
+    var ingresoSeleccionado by remember { mutableStateOf<Ingreso?>(null) }
 
 
     val mesesMap = mapOf(
@@ -261,12 +267,14 @@ fun HomeScreen(
                                                         gastoViewModel.eliminarGasto(gasto)
                                                     }
                                                 ) {
+                                                    Box(modifier = Modifier.clickable { gastoSeleccionado = gasto }) {
                                                     TransactionItem(
                                                         titulo = gasto.descripcion,
                                                         fecha = formatoFecha(gasto.fecha),
                                                         monto = gasto.monto,
                                                         isGasto = true
                                                     )
+                                                }
                                                 }
                                             }
                                         }
@@ -298,12 +306,16 @@ fun HomeScreen(
                                                     ingresoViewModel.eliminarIngreso(ingreso)
                                                 }
                                             ) {
-                                                TransactionItem(
-                                                    titulo = ingreso.descripcion,
-                                                    fecha = formatoFecha(ingreso.fecha),
-                                                    monto = ingreso.monto,
-                                                    isGasto = false
-                                                )
+                                                Box(modifier = Modifier.clickable {
+                                                    ingresoSeleccionado = ingreso
+                                                }) {
+                                                    TransactionItem(
+                                                        titulo = ingreso.descripcion,
+                                                        fecha = formatoFecha(ingreso.fecha),
+                                                        monto = ingreso.monto,
+                                                        isGasto = false
+                                                    )
+                                                }
                                             }
                                         }
                                     }
@@ -313,6 +325,21 @@ fun HomeScreen(
                     }
                 }
             }
+        }
+
+        if (gastoSeleccionado != null) {
+            DetalleGastoDialog(
+                gasto = gastoSeleccionado!!,
+                categoriaNombre = categorias.find { it.idCategoria == gastoSeleccionado!!.idCategoria }?.nombre ?: "Otros",
+                onDismiss = { gastoSeleccionado = null }
+            )
+        }
+
+        if (ingresoSeleccionado != null) {
+            DetalleIngresoDialog(
+                ingreso = ingresoSeleccionado!!,
+                onDismiss = { ingresoSeleccionado = null }
+            )
         }
     }
 }
