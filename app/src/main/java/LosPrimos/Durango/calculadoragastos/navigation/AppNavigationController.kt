@@ -5,10 +5,12 @@ import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.PresupuestoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
+import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoFijoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoFijoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GraficasScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GruposScreen
@@ -69,6 +71,19 @@ sealed class Screen(val route: String) {
 
     object AgregarIngreso : Screen("agregarIngreso")
     object AgregarTarjeta : Screen("agregarTarjeta")
+
+    //formularios de creacion para transacciones fijas
+    object AgregarIngresoFijo : Screen("agregarIngresoFijo")
+    object AgregarGastoFijo : Screen("agregarGastoFijo")
+
+    //formularios de edicion de transacciones fijas
+    object EditarGastoFijo : Screen("editarGastoFijo/{idGasto}") {
+        fun createRoute(idGasto: Int) = "editarGastoFijo/$idGasto"
+    }
+
+    object EditarIngresoFijo : Screen("editarIngresoFijo/{idIngreso}") {
+        fun createRoute(idIngreso: Int) = "editarIngresoFijo/$idIngreso"
+    }
 
     object EditarGasto : Screen("editarGasto/{idGasto}") {
         fun createRoute(idGasto: Int) = "editarGasto/$idGasto"
@@ -255,6 +270,48 @@ fun AppNavigationController(
             AgregarIngresoScreen(
                 onBack = { navController.popBackStack() },
                 ingresoViewModel = ingresoViewModel
+            )
+        }
+
+        composable(Screen.AgregarIngresoFijo.route) {
+            AgregarIngresoFijoScreen(
+                onBack = { navController.popBackStack() },
+                ingresoViewModel = ingresoViewModel
+            )
+        }
+
+        composable(Screen.AgregarGastoFijo.route) {
+            AgregarGastoFijoScreen(
+                onBack = { navController.popBackStack() },
+                gastoViewModel = gastoViewModel
+            )
+        }
+
+        composable(
+            route = Screen.EditarGastoFijo.route,
+            arguments = listOf(navArgument("idGasto") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val idGasto = backStackEntry.arguments?.getInt("idGasto") ?: return@composable
+
+            // reutilizamos la pantalla de AgregarIngresoFijo para editar pasándole el id
+            AgregarGastoFijoScreen(
+                onBack = { navController.popBackStack() },
+                gastoViewModel = gastoViewModel,
+                idGastoEditar = idGasto
+            )
+        }
+
+        composable(
+            route = Screen.EditarIngresoFijo.route,
+            arguments = listOf(navArgument("idIngreso") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val idIngreso = backStackEntry.arguments?.getInt("idIngreso") ?: return@composable
+
+            // reutilizar el formulario de creacion para ahora editar pasando el id
+            AgregarIngresoFijoScreen(
+                onBack = { navController.popBackStack() },
+                ingresoViewModel = ingresoViewModel,
+                idIngresoEditar = idIngreso
             )
         }
 

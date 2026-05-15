@@ -348,48 +348,6 @@ fun CategoryGroup(
 }
 
 @Composable
-fun TransactionItem(
-    titulo: String?,
-    fecha: String,
-    monto: Double,
-    isGasto: Boolean
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(titulo ?:"", fontWeight = FontWeight.Bold, color = DarkGrayText, fontSize = 16.sp)
-            Text(fecha, color = LightBlueGray, fontSize = 12.sp)
-        }
-
-        val colorMonto = if (isGasto) MagentaPink else TealDark
-        val signo = if (isGasto) "-" else "+"
-        Text(
-            text = "$signo$${monto}",
-            fontWeight = FontWeight.ExtraBold,
-            color = colorMonto,
-            fontSize = 16.sp
-        )
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-@Composable
 fun OfflineStatusBar() {
     Box(
         modifier = Modifier
