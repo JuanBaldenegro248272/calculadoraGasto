@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1095326104261",
+    "project_id": "calculadoragastos-188e6",
+    "storage_bucket": "calculadoragastos-188e6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095326104261:android:dcc02fb9d474d7f2a74eac",
+        "android_client_info": {
+          "package_name": "LosPrimos.Durango.calculadoragastos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnGa6JcCtgEmaKfwo8VtH1G45Rjv_uIgE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
