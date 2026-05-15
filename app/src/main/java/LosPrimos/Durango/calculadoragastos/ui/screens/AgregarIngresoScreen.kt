@@ -77,6 +77,8 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel,
         value = idIngresoEditar?.let { ingresoViewModel.obtenerIngresoPorId(it) }
     }
 
+    var errorMessage by remember { mutableStateOf("") }
+
     val context = LocalContext.current
     var fotoUri by remember { mutableStateOf<Uri?>(null) }
     var lugar by remember { mutableStateOf("") }
@@ -111,6 +113,9 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel,
             monto = i.monto.toString()
             descripcion = i.descripcion ?: ""
             fechaLong = i.fecha
+            if (i.fotoRecibo != null) {
+                fotoUri = Uri.parse(i.fotoRecibo)
+            }
         }
     }
 
@@ -235,16 +240,31 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel,
 
 
 @Composable
-private fun BotonAccion(texto: String, icono: ImageVector, onClick: () -> Unit) {
+private fun BotonAccion(
+    texto: String,
+    icono: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth().height(42.dp).border(1.dp, Color(0xFFC8C2D2), RoundedCornerShape(7.dp)),
+        modifier = modifier
+            .height(42.dp)
+            .border(1.dp, Color(0xFFC8C2D2), RoundedCornerShape(7.dp)),
         shape = RoundedCornerShape(7.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color(0xFF363645)),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White,
+            contentColor = Color(0xFF363645)
+        ),
         elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(imageVector = icono, contentDescription = null, tint = Color.Black, modifier = Modifier.size(27.dp))
+            Icon(
+                imageVector = icono,
+                contentDescription = null,
+                tint = Color.Black,
+                modifier = Modifier.size(27.dp)
+            )
             Spacer(modifier = Modifier.width(8.dp))
             Text(text = texto, fontSize = 14.sp)
         }

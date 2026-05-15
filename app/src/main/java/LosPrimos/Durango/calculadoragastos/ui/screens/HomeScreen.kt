@@ -25,6 +25,7 @@ import LosPrimos.Durango.calculadoragastos.utils.SwipeToReveal
 import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import java.text.NumberFormat
@@ -38,6 +39,7 @@ import java.time.format.DateTimeFormatter
 fun HomeScreen(
     gastoViewModel: GastoViewModel,
     ingresoViewModel: IngresoViewModel,
+    presupuestoViewModel: PresupuestoViewModel,
     onNavigate: (String) -> Unit,
     categoriaViewModel: CategoriaViewModel
 ) {
@@ -48,6 +50,7 @@ fun HomeScreen(
         .collectAsState(initial = emptyList())
     val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
     val nombresCategorias = listOf("Todas") + categorias.map { it.nombre }
+    val presupuestos by presupuestoViewModel.obtenerPresupuesto(usuarioActualId ?: 0).collectAsState(initial = emptyList())
 
     val mesesMapReverso = mapOf(
         1 to "Enero", 2 to "Febrero", 3 to "Marzo", 4 to "Abril",
@@ -185,7 +188,7 @@ fun HomeScreen(
 
                 val totalIngresos = ingresos.sumOf { it.monto }
                 val totalGastos = gastos.sumOf { it.monto }
-                val presupuestoMensual = 10000.0
+                val presupuestoMensual = presupuestos.sumOf { it.monto }
                 val proporcionPresupuesto = if (presupuestoMensual > 0) {
                     (totalGastos / presupuestoMensual).toFloat()
                 } else {

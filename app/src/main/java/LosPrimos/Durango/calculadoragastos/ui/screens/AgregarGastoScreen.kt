@@ -71,7 +71,13 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import android.Manifest
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.produceState
+import androidx.compose.ui.draw.clip
 import java.time.ZoneId
 import kotlin.time.Instant
 
@@ -93,6 +99,8 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
     var fechaLong by remember {
         mutableStateOf(LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
     }
+
+    var errorMessage by remember { mutableStateOf("") }
 
     val context = LocalContext.current
     var fotoUri by remember { mutableStateOf<Uri?>(null) }
@@ -137,6 +145,9 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
             fechaLong = g.fecha
             categoriaSeleccionada =
                 categorias.find { it.idCategoria == g.idCategoria }
+            if (g.fotoRecibo != null) {
+                fotoUri = Uri.parse(g.fotoRecibo)
+            }
         }
     }
 
@@ -151,229 +162,173 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
         title = "Nuevo Gasto",
         onBack = onBack
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 18.dp),
-            verticalArrangement = Arrangement.spacedBy(7.dp)
-        ) {
-            Text(
-                text = "Monto",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            OutlinedTextField(
-                value = monto,
-                onValueChange = { monto = it },
-                placeholder = {
-                    Text(
-                        text = "$ 300",
-                        color = Color(0xFF4D4D5C),
-                        fontSize = 14.sp
-                    )
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(58.dp),
-                shape = RoundedCornerShape(7.dp),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = TealDark,
-                    unfocusedIndicatorColor = Color(0xFFC8C2D2),
-                    focusedTextColor = Color(0xFF363645),
-                    unfocusedTextColor = Color(0xFF363645),
-                    cursorColor = TealDark
-                )
-            )
+        Column(modifier = Modifier.fillMaxSize()) {
 
-            Text(
-                text = "Categoria",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Box {
-                OutlinedButton(
-                    onClick = { menuCategorias = true },
-                    modifier = Modifier.height(32.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(1.dp, Color(0xFFC8C2D2)),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color(0xFFF9F9F9),
-                        contentColor = Color(0xFF202124)
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 30.dp, vertical = 18.dp),
+                verticalArrangement = Arrangement.spacedBy(7.dp)
+            ) {
+                Text("Monto", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+                OutlinedTextField(
+                    value = monto,
+                    onValueChange = { monto = it; errorMessage = "" },
+                    placeholder = { Text(text = "$ 300", color = Color(0xFF4D4D5C), fontSize = 14.sp) },
+                    modifier = Modifier.fillMaxWidth().height(58.dp),
+                    shape = RoundedCornerShape(7.dp),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White, unfocusedContainerColor = Color.White,
+                        focusedIndicatorColor = TealDark, unfocusedIndicatorColor = Color(0xFFC8C2D2),
+                        focusedTextColor = Color(0xFF363645), unfocusedTextColor = Color(0xFF363645), cursorColor = TealDark
                     )
-                ) {
-                    Text(
-                        text = categoriaSeleccionada?.nombre ?: "Otros",
-                        fontSize = 13.sp
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Seleccionar categoria",
-                        modifier = Modifier.size(18.dp)
-                    )
+                )
+
+                Text("Categoria", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+                Box {
+                    OutlinedButton(
+                        onClick = { menuCategorias = true },
+                        modifier = Modifier.height(32.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        border = BorderStroke(1.dp, Color(0xFFC8C2D2)),
+                        colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0xFFF9F9F9), contentColor = Color(0xFF202124))
+                    ) {
+                        Text(text = categoriaSeleccionada?.nombre ?: "Otros", fontSize = 13.sp)
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Icon(imageVector = Icons.Default.KeyboardArrowDown, contentDescription = null, modifier = Modifier.size(18.dp))
+                    }
+                    DropdownMenu(expanded = menuCategorias, onDismissRequest = { menuCategorias = false }) {
+                        categorias.forEach { categoria ->
+                            DropdownMenuItem(text = { Text(text = categoria.nombre) }, onClick = { categoriaSeleccionada = categoria; menuCategorias = false })
+                        }
+                    }
                 }
-                DropdownMenu(
-                    expanded = menuCategorias,
-                    onDismissRequest = { menuCategorias = false }
+
+                Text("Descripcion", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+                OutlinedTextField(
+                    value = descripcion,
+                    onValueChange = { descripcion = it; errorMessage = "" },
+                    placeholder = { Text(text = "Ej. Compra en el aurrera", color = Color(0xFF4D4D5C), fontSize = 14.sp) },
+                    modifier = Modifier.fillMaxWidth().height(58.dp),
+                    shape = RoundedCornerShape(7.dp),
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.White, unfocusedContainerColor = Color.White,
+                        focusedIndicatorColor = TealDark, unfocusedIndicatorColor = Color(0xFFC8C2D2),
+                        focusedTextColor = Color(0xFF363645), unfocusedTextColor = Color(0xFF363645), cursorColor = TealDark
+                    )
+                )
+
+                Text("Metodo de pago", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+                Row(horizontalArrangement = Arrangement.spacedBy(44.dp), modifier = Modifier.fillMaxWidth()) {
+                    BotonPago(texto = "Tarjeta", seleccionado = metodoPago == "Tarjeta", onClick = { metodoPago = "Tarjeta" }, modifier = Modifier.weight(1f))
+                    BotonPago(texto = "Efectivo", seleccionado = metodoPago == "Efectivo", onClick = { metodoPago = "Efectivo" }, modifier = Modifier.weight(1f))
+                }
+
+                FormDateField(label = "Fecha", fechaMilisegundos = fechaLong, onDateSelected = { fechaLong = it })
+
+                Text(text = "Ubicacion (Opcional)", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+                BotonAccion(
+                    texto = if (isLoadingLocation) "Buscando satélites..." else if (lugar.isNotEmpty()) lugar.take(30) + "..." else "Capturar Ubicacion",
+                    icono = if (lugar.isNotEmpty() && !isLoadingLocation && lugar != "Permiso denegado") Icons.Default.CheckCircle else Icons.Outlined.LocationOn,
+                    onClick = { locationPermissionLauncher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)) },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Text(text = "Foto del Recibo (Opcional)", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    categorias.forEach { categoria ->
-                        DropdownMenuItem(
-                            text = {
-                                Text(text = categoria.nombre)
-                            },
-                            onClick = {
-                                categoriaSeleccionada = categoria
-                                menuCategorias = false
-                            }
+                    BotonAccion(
+                        texto = if (fotoUri != null) "Cambiar Foto" else "Subir Foto",
+                        icono = if (fotoUri != null) Icons.Default.CheckCircle else Icons.Outlined.FileUpload,
+                        onClick = { galleryLauncher.launch("image/*") },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    if (fotoUri != null) {
+                        Spacer(modifier = Modifier.width(16.dp))
+                        coil.compose.AsyncImage(
+                            model = fotoUri,
+                            contentDescription = "Vista previa recibo",
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .border(1.dp, Color(0xFFC8C2D2), RoundedCornerShape(8.dp)),
+                            contentScale = coil.size.Scale.CROP
                         )
                     }
                 }
             }
 
-            Text(
-                text = "Descripcion",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            OutlinedTextField(
-                value = descripcion,
-                onValueChange = { descripcion = it },
-                placeholder = {
-                    Text(
-                        text = "Ej. Compra en el aurrera",
-                        color = Color(0xFF4D4D5C),
-                        fontSize = 14.sp
-                    )
-                },
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(58.dp),
-                shape = RoundedCornerShape(7.dp),
-                singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
-                    focusedIndicatorColor = TealDark,
-                    unfocusedIndicatorColor = Color(0xFFC8C2D2),
-                    focusedTextColor = Color(0xFF363645),
-                    unfocusedTextColor = Color(0xFF363645),
-                    cursorColor = TealDark
-                )
-            )
-
-            Text(
-                text = "Metodo de pago",
-                fontWeight = FontWeight.ExtraBold,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(44.dp),
-                modifier = Modifier.fillMaxWidth()
+                    .background(Color.Transparent)
+                    .padding(vertical = 16.dp, horizontal = 30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                BotonPago(
-                    texto = "Tarjeta",
-                    seleccionado = metodoPago == "Tarjeta",
-                    onClick = { metodoPago = "Tarjeta" },
-                    modifier = Modifier.weight(1f)
-                )
-                BotonPago(
-                    texto = "Efectivo",
-                    seleccionado = metodoPago == "Efectivo",
-                    onClick = { metodoPago = "Efectivo" },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+                Button(
+                    onClick = {
+                        if (usuarioActualId == null || usuarioActualId == 0) return@Button
 
+                        if (monto.isBlank()) {
+                            errorMessage = "Debes ingresar un monto."
+                            return@Button
+                        }
+                        val montoDouble = monto.toDoubleOrNull()
+                        if (montoDouble == null || montoDouble <= 0) {
+                            errorMessage = "Ingresa un monto numérico válido."
+                            return@Button
+                        }
+                        if (descripcion.isBlank()) {
+                            errorMessage = "La descripción no puede estar vacía."
+                            return@Button
+                        }
 
-            FormDateField(
-                label = "Fecha",
-                fechaMilisegundos = fechaLong,
-                onDateSelected = { fechaLong = it }
-            )
+                        errorMessage = ""
 
-            Text(text = "Ubicacion (Opcional)", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
-
-            BotonAccion(
-                texto = if (isLoadingLocation) "Buscando satélites..." else if (lugar.isNotEmpty()) lugar.take(30) + "..." else "Capturar Ubicacion Actual",
-                icono = if (lugar.isNotEmpty() && !isLoadingLocation && lugar != "Permiso denegado") Icons.Default.CheckCircle else Icons.Outlined.LocationOn,
-                onClick = {
-                    locationPermissionLauncher.launch(
-                        arrayOf(
-                            Manifest.permission.ACCESS_FINE_LOCATION,
-                            Manifest.permission.ACCESS_COARSE_LOCATION
+                        val gasto = Gasto(
+                            idGasto = idGastoEditar ?: 0,
+                            idUsuarioPaga = usuarioActualId!!,
+                            idCategoria = categoriaSeleccionada?.idCategoria,
+                            idGrupo = null, idTarjeta = null,
+                            monto = montoDouble,
+                            descripcion = descripcion,
+                            fecha = fechaLong,
+                            tipoPago = if (metodoPago == "Efectivo") TipoPago.EFECTIVO else TipoPago.TARJETA,
+                            lugar = lugar,
+                            fotoRecibo = fotoUri?.toString()
                         )
+
+                        if (idGastoEditar == null) gastoviewModel.insertarGasto(gasto) else gastoviewModel.actualizarGasto(gasto)
+                        onBack()
+                    },
+                    modifier = Modifier.width(190.dp).height(48.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MagentaPink),
+                    shape = RoundedCornerShape(9.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                ) {
+                    Text(if (idGastoEditar == null) "Guardar" else "Actualizar", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = Color.White)
+                }
+
+                AnimatedVisibility(visible = errorMessage.isNotEmpty()) {
+                    Text(
+                        text = errorMessage,
+                        color = Color.Red,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(top = 8.dp)
                     )
                 }
-            )
 
-            Text(text = "Foto del Recibo (Opcional)", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
-
-            BotonAccion(
-                texto = if (fotoUri != null) "Foto adjuntada" else "Subir Foto",
-                icono = if (fotoUri != null) Icons.Default.CheckCircle else Icons.Outlined.FileUpload,
-                onClick = { galleryLauncher.launch("image/*") }
-            )
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            Button(
-                onClick = {
-                    if (usuarioActualId == null || usuarioActualId == 0) return@Button
-
-                    val montoDouble = monto.toDoubleOrNull() ?: return@Button
-
-                    val gasto = Gasto(
-                        idGasto = idGastoEditar ?: 0,
-                        idUsuarioPaga = usuarioActualId!!,
-                        idCategoria = categoriaSeleccionada?.idCategoria,
-                        idGrupo = null,
-                        idTarjeta = null,
-                        monto = montoDouble,
-                        descripcion = descripcion,
-                        fecha = fechaLong,
-                        tipoPago = if (metodoPago == "Efectivo") {
-                            TipoPago.EFECTIVO
-                        } else {
-                            TipoPago.TARJETA
-                        },
-                        lugar = "",
-                        fotoRecibo = null
-                    )
-
-                    if (idGastoEditar == null) {
-                        gastoviewModel.insertarGasto(gasto)
-                    } else {
-                        gastoviewModel.actualizarGasto(gasto)
-                    }
-                    onBack()
-                },
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .width(190.dp)
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MagentaPink),
-                shape = RoundedCornerShape(9.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-            ) {
-                Text(if (idGastoEditar == null)
-                    "Guardar"
-                else
-                    "Actualizar",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = Color.White
-                )
+                Spacer(modifier = Modifier.height(24.dp))
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
@@ -445,12 +400,12 @@ private fun BotonPago(
 private fun BotonAccion(
     texto: String,
     icono: ImageVector,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .height(42.dp)
             .border(1.dp, Color(0xFFC8C2D2), RoundedCornerShape(7.dp)),
         shape = RoundedCornerShape(7.dp),

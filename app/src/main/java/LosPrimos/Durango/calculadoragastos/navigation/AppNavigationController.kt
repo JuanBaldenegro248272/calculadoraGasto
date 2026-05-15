@@ -148,6 +148,7 @@ fun AppNavigationController(
                 gastoViewModel = gastoViewModel,
                 ingresoViewModel = ingresoViewModel,
                 categoriaViewModel = categoriaViewModel,
+                presupuestoViewModel = presupuestoViewModel,
                 onNavigate = { rutaDestino ->
                     navController.navigate(rutaDestino) {
                         launchSingleTop = true
@@ -183,6 +184,7 @@ fun AppNavigationController(
             PresupuestosScreen(
                 presupuestoViewModel = presupuestoViewModel,
                 gastoViewModel = gastoViewModel,
+                ingresoViewModel = ingresoViewModel,
                 onNavigate = { ruta ->
                     navController.navigate(ruta) {
                         launchSingleTop = true
