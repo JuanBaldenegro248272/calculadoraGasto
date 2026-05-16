@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import LosPrimos.Durango.calculadoragastos.ui.theme.MainGradient
 import LosPrimos.Durango.calculadoragastos.ui.components.*
 import LosPrimos.Durango.calculadoragastos.viewModel.GrupoViewModel
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +28,13 @@ fun GruposScreen(
     val isOffline = true
     var showJoinDialog by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
+    val grupos = grupoViewModel.grupos
 
+    LaunchedEffect(usuarioId) {
+        if (usuarioId != 0){
+            grupoViewModel.obtenerGrupos(usuarioId)
+        }
+    }
     Scaffold(
         bottomBar = {
             SpentBottomNavigation(
@@ -98,37 +105,17 @@ fun GruposScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
                     ) {
-                        item {
-                            GroupCardItem(
-                                titulo = "Viaje a Cancún",
-                                categoriaGrupo = "Amigos",
-                                cantidadMiembros = 6,
-                                montoTotal = 12000.0,
-                                codigoGrupo = "X7B9K",
-                                onClick = { onNavigate("detalleGrupo/1") }
-                            )
-                        }
-
-                        item {
-                            GroupCardItem(
-                                titulo = "Roomies Depa",
-                                categoriaGrupo = "Compañeros",
-                                cantidadMiembros = 3,
-                                montoTotal = 4500.0,
-                                codigoGrupo = "DEP24",
-                                onClick = { onNavigate("detalleGrupo/2") }
-                            )
-                        }
-
-                        item {
-                            GroupCardItem(
-                                titulo = "Cena Fin de Año",
-                                categoriaGrupo = "Familia",
-                                cantidadMiembros = 12,
-                                montoTotal = 8500.0,
-                                codigoGrupo = "CEN12",
-                                onClick = { onNavigate("detalleGrupo/3") }
-                            )
+                        grupos.forEach { grupo ->
+                            item {
+                                GroupCardItem(
+                                    titulo = grupo.nombre,
+                                    categoriaGrupo = grupo.tipo,
+                                    cantidadMiembros = grupo.miembros.size,
+                                    montoTotal = 0.0,
+                                    codigoGrupo = grupo.codigo,
+                                    onClick = { onNavigate("detalleGrupo/1") }
+                                )
+                            }
                         }
                     }
                 }

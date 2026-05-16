@@ -12,4 +12,13 @@ class GrupoRepository(){
         db.collection("grupos").add(grupo)
     }
 
+    fun obtenerGrupos(usuarioId: Int?, resultadoGrupos: (List<Grupo>) -> Unit){
+        if (usuarioId != null) {
+            db.collection("grupos").whereArrayContains("miembros", usuarioId)
+                .get().addOnSuccessListener { resultado -> val grupos = resultado.toObjects(Grupo::class.java)
+                    resultadoGrupos(grupos)
+                }
+        }
+    }
+
 }
