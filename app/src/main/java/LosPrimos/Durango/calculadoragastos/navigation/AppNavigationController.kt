@@ -22,6 +22,7 @@ import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.GrupoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PerfilViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
@@ -133,6 +134,7 @@ fun AppNavigationController(
     val ingresoViewModel: IngresoViewModel = viewModel(factory = factory)
     val categoriaViewModel: CategoriaViewModel = viewModel(factory = factory)
     val presupuestoViewModel: PresupuestoViewModel = viewModel(factory = factory)
+    val grupoViewModel: GrupoViewModel = viewModel(factory = factory)
 
     LaunchedEffect(Unit) {
         categoriaViewModel.insertarCategorias()
@@ -180,7 +182,8 @@ fun AppNavigationController(
                         launchSingleTop = true
                         restoreState = true
                     }
-                }
+                },
+                grupoViewModel = grupoViewModel
             )
         }
         composable("graficas") {

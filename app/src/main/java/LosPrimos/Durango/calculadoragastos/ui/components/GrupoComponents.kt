@@ -253,10 +253,10 @@ fun JoinGroupDialog(
 @Composable
 fun CreateGroupDialog(
     onDismiss: () -> Unit,
-    onCreateConfirm: (nombre: String, categoria: String) -> Unit
+    onCreateConfirm: (nombre: String, categoria: String, codigo: String) -> Unit
 ) {
     var nombreGrupo by remember { mutableStateOf("") }
-
+    val codigoGrupo = remember { (10000..999999).random().toString() }
     val categorias = listOf("Familia", "Pareja", "Viaje", "Amigos", "Otro")
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf(categorias[0]) }
@@ -375,7 +375,7 @@ fun CreateGroupDialog(
                     Button(
                         onClick = {
                             if(nombreGrupo.isNotBlank()) {
-                                onCreateConfirm(nombreGrupo, categoriaSeleccionada)
+                                onCreateConfirm(nombreGrupo, categoriaSeleccionada, codigoGrupo)
                             }
                         },
                         modifier = Modifier.weight(1f),

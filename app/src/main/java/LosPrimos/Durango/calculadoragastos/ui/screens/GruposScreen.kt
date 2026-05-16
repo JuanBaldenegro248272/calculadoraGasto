@@ -1,5 +1,6 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
+import LosPrimos.Durango.calculadoragastos.data.entities.Grupo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -10,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import LosPrimos.Durango.calculadoragastos.ui.theme.MainGradient
 import LosPrimos.Durango.calculadoragastos.ui.components.*
+import LosPrimos.Durango.calculadoragastos.viewModel.GrupoViewModel
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,8 +20,10 @@ import androidx.compose.runtime.setValue
 
 @Composable
 fun GruposScreen(
-    onNavigate: (String) -> Unit
+    onNavigate: (String) -> Unit,
+    grupoViewModel: GrupoViewModel
 ) {
+    val usuarioId by grupoViewModel.usuarioActualId.collectAsState()
     val isOffline = true
     var showJoinDialog by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -52,8 +57,16 @@ fun GruposScreen(
             if (showCreateDialog) {
                 CreateGroupDialog(
                     onDismiss = { showCreateDialog = false },
-                    onCreateConfirm = { nombre, categoria ->
-                        println("Creando grupo: $nombre, Categoría: $categoria")
+                    onCreateConfirm = { nombre, categoria, codigo ->
+                        val nuevoGrupo = Grupo(
+                            nombre = nombre,
+                            tipo = categoria,
+                            imagenGrupo = "",
+                            codigo = codigo,
+                            idUsuario = usuarioId,
+                            miembros = listOf(usuarioId)
+                        )
+                        grupoViewModel.crearGrupo(nuevoGrupo)
                         showCreateDialog = false
                     }
                 )

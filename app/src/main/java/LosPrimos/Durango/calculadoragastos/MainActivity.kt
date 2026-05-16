@@ -4,6 +4,7 @@ import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
 import LosPrimos.Durango.calculadoragastos.data.SpentDatabase
 import LosPrimos.Durango.calculadoragastos.data.repositories.CategoriaRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
+import LosPrimos.Durango.calculadoragastos.data.repositories.GrupoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.IngresoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.PresupuestoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         val ingresoRepository = IngresoRepository(database.ingresoDao())
         val categoriaRepository = CategoriaRepository(database.categoriaDao())
         val presupuestoRepository = PresupuestoRepository(database.presupuestoDao())
+        val grupoRepository = GrupoRepository()
 
         val appViewModelFactory = AppViewModelFactory(
             gastoRepository = gastoRepository,
@@ -45,7 +47,8 @@ class MainActivity : AppCompatActivity() {
             dataStoreManager = dataStoreManager,
             ingresoRepository = ingresoRepository,
             categoriaRepository = categoriaRepository,
-            presupuestoRepository = presupuestoRepository
+            presupuestoRepository = presupuestoRepository,
+            grupoRepository = grupoRepository
         )
 
         setContent {
