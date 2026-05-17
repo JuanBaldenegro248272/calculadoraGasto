@@ -4,6 +4,7 @@ import LosPrimos.Durango.calculadoragastos.ui.theme.DarkGrayText
 import LosPrimos.Durango.calculadoragastos.ui.theme.LightBlueGray
 import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
+import LosPrimos.Durango.calculadoragastos.utils.formatCurrency
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -38,7 +39,7 @@ fun TransactionItem(
         val colorMonto = if (isGasto) MagentaPink else TealDark
         val signo = if (isGasto) "-" else "+"
         Text(
-            text = "$signo$${monto}",
+            text = "$signo${formatCurrency(monto)}",
             fontWeight = FontWeight.ExtraBold,
             color = colorMonto,
             fontSize = 16.sp
