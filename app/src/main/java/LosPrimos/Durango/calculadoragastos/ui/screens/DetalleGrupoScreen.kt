@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
 import LosPrimos.Durango.calculadoragastos.ui.components.SpentBottomNavigation
+import LosPrimos.Durango.calculadoragastos.data.entities.GastoGrupo
 import LosPrimos.Durango.calculadoragastos.ui.theme.BackgroundLight
 import LosPrimos.Durango.calculadoragastos.ui.theme.DarkGrayText
 import LosPrimos.Durango.calculadoragastos.ui.theme.LightBlueGray
@@ -8,6 +9,7 @@ import LosPrimos.Durango.calculadoragastos.ui.theme.MagentaPink
 import LosPrimos.Durango.calculadoragastos.ui.theme.MainGradient
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
 import LosPrimos.Durango.calculadoragastos.ui.theme.SurfaceWhite
+import LosPrimos.Durango.calculadoragastos.viewModel.GastoGrupoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GrupoViewModel
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,10 +29,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Celebration
 import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.South
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -55,13 +59,21 @@ import coil.compose.AsyncImage
 fun DetalleGrupoScreen(
     grupoId: String,
     grupoViewModel: GrupoViewModel,
+    gastoGrupoViewModel: GastoGrupoViewModel,
     onBack: () -> Unit,
     onNavigate: (String) -> Unit
 ) {
     val grupo = grupoViewModel.grupoSeleccionado
+    val gastosGrupo = gastoGrupoViewModel.gastosGrupo
+    val totalSalud = gastosGrupo.filter { it.idCategoria == 5 }.sumOf { it.montoTotal }
+    val totalAlimentacion = gastosGrupo.filter { it.idCategoria == 4 }.sumOf { it.montoTotal }
+    val totalTransporte = gastosGrupo.filter { it.idCategoria == 3 }.sumOf { it.montoTotal }
+    val totalEntretenimiento = gastosGrupo.filter { it.idCategoria == 2 }.sumOf { it.montoTotal }
+    val usuarioActualId = gastoGrupoViewModel.usuarioActualId.value
 
     LaunchedEffect(grupoId) {
         grupoViewModel.obtenerGrupoPorId(grupoId)
+        gastoGrupoViewModel.obtenerGastos(grupoId)
     }
 
     Scaffold(
@@ -73,7 +85,7 @@ fun DetalleGrupoScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { onNavigate("agregarGasto?grupoId=$grupoId") },
+                onClick = { onNavigate("agregarGastoGrupo/$grupoId") },
                 containerColor = TealDark,
                 contentColor = Color.White
             ) {
@@ -170,23 +182,35 @@ fun DetalleGrupoScreen(
                         ) {
                             CategoriaDetalleGrupo(
                                 nombre = "Salud",
-                                monto = 0.0,
-                                icono = Icons.Default.LocalHospital
+                                monto = totalSalud,
+                                icono = Icons.Default.LocalHospital,
+                                gastos = gastosGrupo.filter { it.idCategoria == 5 },
+                                usuarioActualId = usuarioActualId,
+                                onEliminar = { gastoGrupoViewModel.eliminarGasto(it) }
                             )
                             CategoriaDetalleGrupo(
                                 nombre = "Alimentacion",
-                                monto = 0.0,
-                                icono = Icons.Default.Restaurant
+                                monto = totalAlimentacion,
+                                icono = Icons.Default.Restaurant,
+                                gastos = gastosGrupo.filter { it.idCategoria == 4 },
+                                usuarioActualId = usuarioActualId,
+                                onEliminar = { gastoGrupoViewModel.eliminarGasto(it) }
                             )
                             CategoriaDetalleGrupo(
                                 nombre = "Transporte",
-                                monto = 0.0,
-                                icono = Icons.Default.DirectionsCar
+                                monto = totalTransporte,
+                                icono = Icons.Default.DirectionsCar,
+                                gastos = gastosGrupo.filter { it.idCategoria == 3 },
+                                usuarioActualId = usuarioActualId,
+                                onEliminar = { gastoGrupoViewModel.eliminarGasto(it) }
                             )
                             CategoriaDetalleGrupo(
                                 nombre = "Entretenimiento",
-                                monto = 0.0,
-                                icono = Icons.Default.Celebration
+                                monto = totalEntretenimiento,
+                                icono = Icons.Default.Celebration,
+                                gastos = gastosGrupo.filter { it.idCategoria == 2 },
+                                usuarioActualId = usuarioActualId,
+                                onEliminar = { gastoGrupoViewModel.eliminarGasto(it) }
                             )
                         }
                     }
@@ -232,36 +256,115 @@ private fun ImagenGrupo(
 private fun CategoriaDetalleGrupo(
     nombre: String,
     monto: Double,
-    icono: ImageVector
+    icono: ImageVector,
+    gastos: List<GastoGrupo>,
+    usuarioActualId: String?,
+    onEliminar: (GastoGrupo) -> Unit
 ) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 9.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = icono,
+                contentDescription = null,
+                tint = Color.Black,
+                modifier = Modifier.size(25.dp)
+            )
+
+            Spacer(modifier = Modifier.width(8.dp))
+
+            Text(
+                text = nombre,
+                color = Color.Black,
+                fontWeight = FontWeight.ExtraBold,
+                fontSize = 16.sp,
+                modifier = Modifier.weight(1f)
+            )
+
+            Text(
+                text = "$${"%.2f".format(monto)}",
+                color = if (monto > 0.0) Color.Red else MagentaPink,
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp
+            )
+        }
+
+        gastos.forEach { gasto ->
+            GastoGrupoItem(
+                gasto = gasto,
+                esMio = gasto.idUsuarioPagador == usuarioActualId,
+                onEliminar = { onEliminar(gasto) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun GastoGrupoItem(
+    gasto: GastoGrupo,
+    esMio: Boolean,
+    onEliminar: () -> Unit
+) {
+    val cantidadMiembros = if (gasto.cantidadMiembros <= 0) 1 else gasto.cantidadMiembros
+    val miParte = gasto.montoTotal / cantidadMiembros
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 9.dp),
+            .padding(start = 38.dp, top = 6.dp, bottom = 6.dp)
+            .background(BackgroundLight, RoundedCornerShape(10.dp))
+            .padding(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = icono,
+            imageVector = Icons.Default.South,
             contentDescription = null,
-            tint = DarkGrayText,
-            modifier = Modifier.size(25.dp)
+            tint = Color.Red,
+            modifier = Modifier.size(24.dp)
         )
 
         Spacer(modifier = Modifier.width(8.dp))
 
-        Text(
-            text = nombre,
-            color = DarkGrayText,
-            fontWeight = FontWeight.ExtraBold,
-            fontSize = 16.sp,
-            modifier = Modifier.weight(1f)
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = gasto.descripcion,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 12.sp,
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = if (esMio) "Tu" else "Otro",
+                    color = Color.Black,
+                    fontSize = 11.sp
+                )
+            }
 
-        Text(
-            text = "$${"%.2f".format(monto)}",
-            color = MagentaPink,
-            fontWeight = FontWeight.Bold,
-            fontSize = 13.sp
-        )
+            Text(
+                text = "- $${"%.2f".format(gasto.montoTotal)}",
+                color = Color.Red,
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp
+            )
+
+            Text(
+                text = "Tu parte: $${"%.2f".format(miParte)}",
+                color = Color.Black,
+                fontSize = 11.sp
+            )
+        }
+
+        IconButton(onClick = onEliminar) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Eliminar gasto",
+                tint = Color.Black,
+                modifier = Modifier.size(18.dp)
+            )
+        }
     }
 }
