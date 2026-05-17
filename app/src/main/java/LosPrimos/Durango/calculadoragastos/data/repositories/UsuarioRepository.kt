@@ -17,14 +17,13 @@ class UsuarioRepository(private val usuarioDao: UsuarioDao) {
         return usuarioDao.loginUsuario(correo, contrasena)
     }
 
-    fun obtenerUsuarioPorId(usuarioId: Int): Flow<Usuario?> {
+    fun obtenerUsuarioPorId(usuarioId: String): Flow<Usuario?> {
         return usuarioDao.getUsuarioById(usuarioId)
     }
 
-    suspend fun existeUsuario(id: Int): Boolean {
+    suspend fun existeUsuario(id: String): Boolean {
         return usuarioDao.getUsuarioByIdSuspend(id) != null
     }
-
 
     suspend fun verificarCorreoExistente(correo: String): Usuario? {
         return usuarioDao.verificarCorreoExistente(correo)

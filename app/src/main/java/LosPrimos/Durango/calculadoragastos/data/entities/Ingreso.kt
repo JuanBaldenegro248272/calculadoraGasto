@@ -24,7 +24,7 @@ data class Ingreso(
     val fecha: Long,
     val descripcion: String?,
     val idCategoria: Int?,
-    val idUsuario: Int?,
+    val idUsuario: String,
     val lugar: String?,
     val fotoRecibo: String?,
     val esFijo: Boolean = false,

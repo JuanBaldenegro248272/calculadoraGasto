@@ -316,16 +316,11 @@ fun RegisterScreen(navController: NavController, viewModel: AuthViewModel) {
             SpentButton(text = "Crear Cuenta") {
                 if (validar()) {
                     viewModel.register(
-                        Usuario(
-                            idUsuario        = 0,
-                            nombre           = nombre.trim(),
-                            correo           = email.trim(),
-                            hashContrasena   = password,
-                            fechaNacimiento  = fechaNacimientoMs!!,
-                            genero           = genero,
-                            fotoPerfil       = null,
-                            fechaRegistro    = System.currentTimeMillis()
-                        )
+                        nombre = nombre.trim(),
+                        correo = email.trim(),
+                        contrasena = password,
+                        fechaNacimiento = fechaNacimientoMs!!,
+                        genero = genero
                     )
                 }
             }

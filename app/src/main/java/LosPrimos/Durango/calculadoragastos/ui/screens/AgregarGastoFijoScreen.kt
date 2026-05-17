@@ -51,6 +51,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.produceState
+import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -155,14 +156,14 @@ fun AgregarGastoFijoScreen(
             ) {
                 Button(
                     onClick = {
-                        if (usuarioActualId == null || usuarioActualId == 0) return@Button
+                        if (usuarioActualId.isNullOrBlank()) return@Button
                         val montoDouble = monto.toDoubleOrNull()
                         if (montoDouble == null || montoDouble <= 0) { errorMessage = "Monto inválido."; return@Button }
                         if (descripcion.isBlank()) { errorMessage = "La descripción no puede estar vacía."; return@Button }
                         if (frecuenciaSeleccionada.isBlank()) { errorMessage = "Selecciona una frecuencia."; return@Button }
 
                         val gasto = Gasto(
-                            idGasto = idGastoEditar ?: 0,
+                            idGasto = idGastoEditar ?: UUID.randomUUID().toString(),
                             idUsuarioPaga = usuarioActualId!!,
                             idCategoria = null, idGrupo = null, idTarjeta = null,
                             monto = montoDouble, descripcion = descripcion,

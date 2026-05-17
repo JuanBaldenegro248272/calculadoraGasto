@@ -1,41 +1,19 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
-import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
 import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
-import LosPrimos.Durango.calculadoragastos.data.enums.TipoPago
 import LosPrimos.Durango.calculadoragastos.ui.components.GradientFormBackground
 import LosPrimos.Durango.calculadoragastos.ui.theme.TealDark
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,10 +25,8 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.produceState
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -76,12 +52,12 @@ fun AgregarIngresoFijoScreen(
         ingresoExistente?.let { i ->
             monto = i.monto.toString()
             descripcion = (i.descripcion ?: "Sin descripcion")
-            frecuenciaSeleccionada = i.lugar!!.ifEmpty { "Mensual" }
+            frecuenciaSeleccionada = i.lugar ?: "Mensual"
         }
     }
 
     GradientFormBackground(
-        title = if (idIngresoEditar == null) "Nuevo Gasto Fijo" else "Editar Gasto Fijo",
+        title = if (idIngresoEditar == null) "Nuevo Ingreso Fijo" else "Editar Ingreso Fijo",
         onBack = onBack
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -155,7 +131,8 @@ fun AgregarIngresoFijoScreen(
             ) {
                 Button(
                     onClick = {
-                        if (usuarioActualId == null || usuarioActualId == 0) return@Button
+                        if (usuarioActualId.isNullOrBlank()) return@Button
+
                         val montoDouble = monto.toDoubleOrNull()
                         if (montoDouble == null || montoDouble <= 0) { errorMessage = "Monto inválido."; return@Button }
                         if (descripcion.isBlank()) { errorMessage = "La descripción no puede estar vacía."; return@Button }
@@ -165,14 +142,17 @@ fun AgregarIngresoFijoScreen(
                             idUsuario = usuarioActualId!!,
                             idIngreso = idIngresoEditar ?: 0,
                             idCategoria = null,
-                            monto = montoDouble, descripcion = descripcion,
+                            monto = montoDouble,
+                            descripcion = descripcion,
                             fecha = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
                             lugar = frecuenciaSeleccionada,
                             fotoRecibo = null,
                             esFijo = true
                         )
 
-                        if (idIngresoEditar == null) ingresoViewModel.insertarIngreso(ingreso) else ingresoViewModel.actualizarIngreso(ingreso)
+                         if (idIngresoEditar == null) ingresoViewModel.insertarIngreso(ingreso) else ingresoViewModel.actualizarIngreso(ingreso)
+
+
                         onBack()
                     },
                     modifier = Modifier.width(190.dp).height(48.dp),

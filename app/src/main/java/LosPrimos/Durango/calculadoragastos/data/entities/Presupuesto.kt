@@ -31,6 +31,6 @@ data class Presupuesto(
     val mes: Int,
     val anio: Int,
     val porcentaje: Int,
-    val idUsuario: Int,
+    val idUsuario: String,
     val idCategoria: Int
 )

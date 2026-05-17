@@ -42,11 +42,11 @@ import androidx.room.Index
     ]
 )
 data class Gasto(
-    @PrimaryKey(autoGenerate = true)
-    val idGasto: Int,
-    val idUsuarioPaga: Int,
+    @PrimaryKey
+    val idGasto: String,
+    val idUsuarioPaga: String,
     val idCategoria: Int?,
-    val idGrupo: Int?,
+    val idGrupo: String?,
     val idTarjeta: Int?,
     val monto: Double,
     val descripcion: String,

@@ -73,11 +73,12 @@ import androidx.compose.runtime.produceState
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
+import java.util.UUID
 
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categoriaViewModel: CategoriaViewModel, idGastoEditar: Int? = null) {
+fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categoriaViewModel: CategoriaViewModel, idGastoEditar: String? = null) {
     val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
     var menuCategorias by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf<Categoria?>(null) }
@@ -349,7 +350,7 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
             ) {
                 Button(
                     onClick = {
-                        if (usuarioActualId == null || usuarioActualId == 0) return@Button
+                        if (usuarioActualId.isNullOrBlank()) return@Button
 
                         if (monto.isBlank()) { errorMessage = "Debes ingresar un monto."; return@Button }
                         val montoDouble = monto.toDoubleOrNull()
@@ -359,9 +360,17 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
                         errorMessage = ""
 
                         val gasto = Gasto(
-                            idGasto = idGastoEditar ?: 0, idUsuarioPaga = usuarioActualId!!, idCategoria = categoriaSeleccionada?.idCategoria,
-                            idGrupo = null, idTarjeta = null, monto = montoDouble, descripcion = descripcion, fecha = fechaLong,
-                            tipoPago = if (metodoPago == "Efectivo") TipoPago.EFECTIVO else TipoPago.TARJETA, lugar = lugar, fotoRecibo = fotoUri?.toString()
+                            idGasto = idGastoEditar ?: UUID.randomUUID().toString(),
+                            idUsuarioPaga = usuarioActualId!!,
+                            idCategoria = categoriaSeleccionada?.idCategoria,
+                            idGrupo = null,
+                            idTarjeta = null,
+                            monto = montoDouble,
+                            descripcion = descripcion,
+                            fecha = fechaLong,
+                            tipoPago = if (metodoPago == "Efectivo") TipoPago.EFECTIVO else TipoPago.TARJETA,
+                            lugar = lugar,
+                            fotoRecibo = fotoUri?.toString()
                         )
 
                         if (idGastoEditar == null) gastoviewModel.insertarGasto(gasto) else gastoviewModel.actualizarGasto(gasto)

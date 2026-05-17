@@ -7,8 +7,8 @@ import java.util.Date
 
 @Entity(tableName = "usuarios")
 data class Usuario(
-    @PrimaryKey(autoGenerate = true)
-    val idUsuario: Int,
+    @PrimaryKey
+    val idUsuario: String,
     val nombre: String,
     val correo: String,
     val hashContrasena: String,

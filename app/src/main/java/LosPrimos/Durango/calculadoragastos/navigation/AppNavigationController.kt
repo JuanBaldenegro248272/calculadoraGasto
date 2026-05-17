@@ -57,11 +57,11 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
 
     object DetalleGrupo : Screen("detalleGrupo/{grupoId}") {
-        fun createRoute(grupoId: Int) = "detalleGrupo/$grupoId"
+        fun createRoute(grupoId: String) = "detalleGrupo/$grupoId"
     }
 
     object AgregarGasto : Screen("agregarGasto?grupoId={grupoId}") {
-        fun createRoute(grupoId: Int? = null): String {
+        fun createRoute(grupoId: String? = null): String {
             return if (grupoId != null) {
                 "agregarGasto?grupoId=$grupoId"
             } else {
@@ -79,22 +79,20 @@ sealed class Screen(val route: String) {
 
     //formularios de edicion de transacciones fijas
     object EditarGastoFijo : Screen("editarGastoFijo/{idGasto}") {
-        fun createRoute(idGasto: Int) = "editarGastoFijo/$idGasto"
+        fun createRoute(idGasto: String) = "editarGastoFijo/$idGasto"
     }
 
     object EditarIngresoFijo : Screen("editarIngresoFijo/{idIngreso}") {
-        fun createRoute(idIngreso: Int) = "editarIngresoFijo/$idIngreso"
+        fun createRoute(idIngreso: String) = "editarIngresoFijo/$idIngreso"
     }
 
     object EditarGasto : Screen("editarGasto/{idGasto}") {
-        fun createRoute(idGasto: Int) = "editarGasto/$idGasto"
+        fun createRoute(idGasto: String) = "editarGasto/$idGasto"
     }
 
     object EditarIngreso : Screen("editarIngreso/{idIngreso}") {
-        fun createRoute(idIngreso: Int) = "editarIngreso/$idIngreso"
+        fun createRoute(idIngreso: String) = "editarIngreso/$idIngreso"
     }
-
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -127,7 +125,6 @@ fun AppNavigationController(
         }
         return
     }
-
 
 
     val gastoViewModel: GastoViewModel = viewModel(factory = factory)
@@ -188,11 +185,11 @@ fun AppNavigationController(
         }
         composable("graficas") {
             GraficasScreen(
-                onNavigate       = { navController.navigate(it) },
-                gastoViewModel   = gastoViewModel,
+                onNavigate = { navController.navigate(it) },
+                gastoViewModel = gastoViewModel,
                 ingresoViewModel = ingresoViewModel,
                 presupuestoViewModel = presupuestoViewModel,
-                categoriaViewModel   = categoriaViewModel
+                categoriaViewModel = categoriaViewModel
             )
         }
 
@@ -233,33 +230,39 @@ fun AppNavigationController(
         // Detalle de Grupo
         composable(
             route = Screen.DetalleGrupo.route,
-            arguments = listOf(navArgument("grupoId") { type = NavType.IntType })
+            arguments = listOf(navArgument("grupoId") {
+                type = NavType.StringType
+            })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("grupoId") ?: 0
+            val id = backStackEntry.arguments?.getString("grupoId") ?: ""
         }
 
         // Formulario de Gasto (Individual o Grupo)
         composable(
             route = Screen.AgregarGasto.route,
             arguments = listOf(navArgument("grupoId") {
-                type = NavType.IntType
-                defaultValue = -1
+                type = NavType.StringType
+                nullable = true
+                defaultValue = null
             })
         ) { backStackEntry ->
-            val id = backStackEntry.arguments?.getInt("grupoId")
-            val grupoId = if (id == -1) null else id
+            val grupoId = backStackEntry.arguments?.getString("grupoId")
             AgregarGastoScreen(
                 onBack = { navController.popBackStack() },
                 gastoviewModel = gastoViewModel,
                 categoriaViewModel = categoriaViewModel
+
             )
         }
 
         composable(
             route = Screen.EditarGasto.route,
-            arguments = listOf(navArgument("idGasto") { type = NavType.IntType })
+            arguments = listOf(navArgument("idGasto") {
+                type = NavType.StringType
+            })
         ) { backStackEntry ->
-            val idGasto = backStackEntry.arguments?.getInt("idGasto") ?: return@composable
+            val idGasto =
+                backStackEntry.arguments?.getString("idGasto") ?: return@composable
             AgregarGastoScreen(
                 onBack = { navController.popBackStack() },
                 gastoviewModel = gastoViewModel,
@@ -291,11 +294,13 @@ fun AppNavigationController(
 
         composable(
             route = Screen.EditarGastoFijo.route,
-            arguments = listOf(navArgument("idGasto") { type = NavType.IntType })
+            arguments = listOf(navArgument("idGasto") {
+                type = NavType.StringType
+            })
         ) { backStackEntry ->
-            val idGasto = backStackEntry.arguments?.getInt("idGasto") ?: return@composable
+            val idGasto =
+                backStackEntry.arguments?.getString("idGasto") ?: return@composable
 
-            // reutilizamos la pantalla de AgregarIngresoFijo para editar pasándole el id
             AgregarGastoFijoScreen(
                 onBack = { navController.popBackStack() },
                 gastoViewModel = gastoViewModel,
@@ -305,11 +310,13 @@ fun AppNavigationController(
 
         composable(
             route = Screen.EditarIngresoFijo.route,
-            arguments = listOf(navArgument("idIngreso") { type = NavType.IntType })
+            arguments = listOf(navArgument("idIngreso") {
+                type = NavType.StringType
+            })
         ) { backStackEntry ->
-            val idIngreso = backStackEntry.arguments?.getInt("idIngreso") ?: return@composable
+            val idIngreso = backStackEntry.arguments?.getString("idIngreso")
+                ?: return@composable
 
-            // reutilizar el formulario de creacion para ahora editar pasando el id
             AgregarIngresoFijoScreen(
                 onBack = { navController.popBackStack() },
                 ingresoViewModel = ingresoViewModel,
@@ -319,9 +326,12 @@ fun AppNavigationController(
 
         composable(
             route = Screen.EditarIngreso.route,
-            arguments = listOf(navArgument("idIngreso") { type = NavType.IntType })
+            arguments = listOf(navArgument("idIngreso") {
+                type = NavType.StringType
+            })
         ) { backStackEntry ->
-            val idIngreso = backStackEntry.arguments?.getInt("idIngreso") ?: return@composable
+            val idIngreso = backStackEntry.arguments?.getString("idIngreso")
+                ?: return@composable
             AgregarIngresoScreen(
                 onBack = { navController.popBackStack() },
                 ingresoViewModel = ingresoViewModel,

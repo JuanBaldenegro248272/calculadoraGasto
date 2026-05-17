@@ -14,16 +14,16 @@ class DataStoreManager(private val context: Context) {
 
     companion object {
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
-        val USER_ID = intPreferencesKey("user_id")
+        val USER_ID = stringPreferencesKey("user_id")
     }
 
     val isLoggedInFlow: Flow<Boolean> = context.dataStore.data
         .map { it[IS_LOGGED_IN] ?: false }
 
-    val userIdFlow: Flow<Int?> = context.dataStore.data
+    val userIdFlow: Flow<String?> = context.dataStore.data
         .map { it[USER_ID] }
 
-    suspend fun saveSession(userId: Int) {
+    suspend fun saveSession(userId: String) {
         context.dataStore.edit {
             it[IS_LOGGED_IN] = true
             it[USER_ID] = userId
