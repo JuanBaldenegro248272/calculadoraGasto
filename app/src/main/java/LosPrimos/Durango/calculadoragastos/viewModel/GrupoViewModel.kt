@@ -3,6 +3,7 @@ package LosPrimos.Durango.calculadoragastos.viewModel
 import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
 import LosPrimos.Durango.calculadoragastos.data.entities.Grupo
 import LosPrimos.Durango.calculadoragastos.data.repositories.GrupoRepository
+import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -28,10 +29,12 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
         null
     )
 
-    fun crearGrupo(grupo: Grupo){
+    fun crearGrupo(grupo: Grupo, imagenUri: Uri?){
         repository.crearGrupo(
             grupo = grupo,
+            imagenUri = imagenUri,
             onSuccess = {
+                errorMessage = null
                 obtenerGrupos(usuarioActualId.value)
             },
             onError = { exception ->
@@ -46,6 +49,7 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
         repository.obtenerGrupos(
             usuarioId = usuarioId,
             onResult = { lista ->
+                errorMessage = null
                 grupos = lista
             },
             onError = { exception ->
@@ -60,6 +64,7 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
         repository.obtenerGrupoPorId(
             grupoId = grupoId,
             onResult = { grupo ->
+                errorMessage = null
                 grupoSeleccionado = grupo
             },
             onError = { exception ->
@@ -69,12 +74,20 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
     }
 
     fun unirseAGrupo(codigo: String, usuarioId: String) {
-        if (codigo.isBlank() || usuarioId.isBlank()) return
+        if (codigo.isBlank()) {
+            errorMessage = "Escribe el codigo del grupo."
+            return
+        }
+        if (usuarioId.isBlank()) {
+            errorMessage = "No se encontro el usuario actual."
+            return
+        }
 
-        repository.unirseAGrupoPorCodigo(
+        repository.unirseAGrupoFlexible(
             codigo = codigo,
             usuarioId = usuarioId,
             onSuccess = {
+                errorMessage = null
                 obtenerGrupos(usuarioId)
             },
             onError = { exception ->

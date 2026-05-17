@@ -18,13 +18,15 @@ class NetworkConnectivityObserver(context: Context) {
         return callbackFlow {
             val activeNetwork = connectivityManager.activeNetwork
             val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-            val isConnected = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+            val isConnected = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
             trySend(isConnected)
 
             val callback = object : ConnectivityManager.NetworkCallback() {
                 override fun onAvailable(network: Network) {
                     super.onAvailable(network)
-                    trySend(true)
+                    val capabilities = connectivityManager.getNetworkCapabilities(network)
+                    val isConnected = capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true
+                    trySend(isConnected)
                 }
 
                 override fun onLost(network: Network) {

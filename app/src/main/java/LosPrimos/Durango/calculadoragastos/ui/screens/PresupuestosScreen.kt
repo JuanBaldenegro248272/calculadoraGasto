@@ -84,9 +84,7 @@ fun PresupuestosScreen(
     val presupuestoBase = ingresosFijosTotales - gastosFijosTotales
     val presupuestoAsignadoTotal = presupuestos.sumOf { it.monto }
     val disponibleParaDistribuir = presupuestoBase - presupuestoAsignadoTotal
-    val presupuestoGastado = gastos.sumOf { gasto ->
-        if (presupuestos.any { it.idCategoria == gasto.idCategoria }) gasto.monto else 0.0
-    }
+    val presupuestoGastado = gastos.filter { !it.esFijo }.sumOf { it.monto }
 
     val presupuestoVivienda = presupuestos.find { it.idCategoria == 1 }
     val montoPresupuestoVivienda = presupuestoVivienda?.monto ?: 0.0

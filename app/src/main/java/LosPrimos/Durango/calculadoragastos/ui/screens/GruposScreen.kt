@@ -13,10 +13,12 @@ import androidx.compose.ui.unit.dp
 import LosPrimos.Durango.calculadoragastos.ui.theme.MainGradient
 import LosPrimos.Durango.calculadoragastos.ui.components.*
 import LosPrimos.Durango.calculadoragastos.utils.NetworkConnectivityObserver
+import LosPrimos.Durango.calculadoragastos.viewModel.GastoGrupoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GrupoViewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,13 +30,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
 
 @Composable
 fun GruposScreen(
     onNavigate: (String) -> Unit,
-    grupoViewModel: GrupoViewModel
+    grupoViewModel: GrupoViewModel,
+    gastoGrupoViewModel: GastoGrupoViewModel
 ) {
     val usuarioActualId by grupoViewModel.usuarioActualId.collectAsState()
     val usuarioId = usuarioActualId ?: ""
@@ -42,6 +44,9 @@ fun GruposScreen(
     var showJoinDialog by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     val grupos = grupoViewModel.grupos
+    val errorMessage = grupoViewModel.errorMessage
+    val totalesPorGrupo by gastoGrupoViewModel.totalesPorGrupo.collectAsState()
+    val deudasPorGrupo by gastoGrupoViewModel.deudasPorGrupo.collectAsState()
 
     val context = LocalContext.current
 
@@ -53,6 +58,12 @@ fun GruposScreen(
     LaunchedEffect(usuarioId) {
         if (usuarioId.isNotBlank()) {
             grupoViewModel.obtenerGrupos(usuarioId)
+        }
+    }
+
+    LaunchedEffect(grupos.size, usuarioId) {
+        if (usuarioId.isNotBlank()) {
+            gastoGrupoViewModel.cargarResumenesDeGrupos(grupos, usuarioId)
         }
     }
 
@@ -85,24 +96,24 @@ fun GruposScreen(
                 CreateGroupDialog(
                     onDismiss = { showCreateDialog = false },
                     onCreateConfirm = { nombre, categoria, codigo, imagenUri ->
-                        val uid = FirebaseAuth.getInstance().currentUser?.uid
-                        if (uid != null) {
+                        if (usuarioId.isNotBlank()) {
                             val nuevoGrupo = Grupo(
+                                idGrupo = UUID.randomUUID().toString(),
                                 nombre = nombre,
                                 tipo = categoria,
-                                imagenGrupo = imagenUri,
+                                imagenGrupo = "",
                                 codigo = codigo,
                                 idUsuarioCreador = usuarioId,
                                 miembrosIds = listOf(usuarioId)
                             )
-                            grupoViewModel.crearGrupo(nuevoGrupo)
+                            grupoViewModel.crearGrupo(nuevoGrupo, imagenUri)
                         }
                         showCreateDialog = false
                     }
                 )
             }
 
-            if (!hasInternet) {
+            if (false && !hasInternet) {
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
@@ -141,32 +152,21 @@ fun GruposScreen(
 
                     GroupsTopBar()
 
-                    GroupActionButtons(
-                        onCreateClick = { showCreateDialog = true },
-                        onJoinClick = { showJoinDialog = true }
+                GroupActionButtons(
+                    onCreateClick = { showCreateDialog = true },
+                    onJoinClick = { showJoinDialog = true }
+                )
+
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
                     )
+                }
 
-                    Spacer(modifier = Modifier.height(24.dp))
-
-<<<<<<< Updated upstream
-                    BottomRoundedSurface {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
-                        ) {
-                            grupos.forEach { grupo ->
-                                item {
-                                    GroupCardItem(
-                                        titulo = grupo.nombre,
-                                        categoriaGrupo = grupo.tipo,
-                                        cantidadMiembros = grupo.miembrosIds.size,
-                                        montoTotal = 0.0,
-                                        codigoGrupo = grupo.codigo,
-                                        onClick = { onNavigate(Screen.DetalleGrupo.createRoute(grupo.idGrupo)) }
-                                    )
-                                }
-=======
-                    LazyColumn(
+                LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp)
                     ) {
@@ -176,11 +176,11 @@ fun GruposScreen(
                                     titulo = grupo.nombre,
                                     categoriaGrupo = grupo.tipo,
                                     cantidadMiembros = grupo.miembrosIds.size,
-                                    montoTotal = 0.0,
+                                    montoTotal = totalesPorGrupo[grupo.idGrupo] ?: 0.0,
+                                    miDeuda = deudasPorGrupo[grupo.idGrupo] ?: 0.0,
                                     codigoGrupo = grupo.codigo,
-                                    onClick = { onNavigate("detalleGrupo/${grupo.idGrupo}") }
+                                    onClick = { onNavigate(Screen.DetalleGrupo.createRoute(grupo.idGrupo)) }
                                 )
->>>>>>> Stashed changes
                             }
                         }
                     }

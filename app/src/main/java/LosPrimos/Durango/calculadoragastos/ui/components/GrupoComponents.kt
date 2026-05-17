@@ -185,6 +185,7 @@ fun GroupCardItem(
     categoriaGrupo: String,
     cantidadMiembros: Int,
     montoTotal: Double,
+    miDeuda: Double,
     codigoGrupo: String,
     onClick: () -> Unit
 ) {
@@ -249,8 +250,8 @@ fun GroupCardItem(
             Spacer(modifier = Modifier.height(14.dp))
 
             FilaDatoGrupo(
-                titulo = "Mi deuda",
-                valor = "$0.00",
+                titulo = "Mi parte",
+                valor = "$${"%.2f".format(miDeuda)}",
                 colorValor = MagentaPink
             )
 
@@ -388,10 +389,10 @@ fun JoinGroupDialog(
 @Composable
 fun CreateGroupDialog(
     onDismiss: () -> Unit,
-    onCreateConfirm: (nombre: String, categoria: String, codigo: String, imagenUri: String) -> Unit
+    onCreateConfirm: (nombre: String, categoria: String, codigo: String, imagenUri: Uri?) -> Unit
 ) {
     var nombreGrupo by remember { mutableStateOf("") }
-    val codigoGrupo = remember { (10000..999999).random().toString() }
+    val codigoGrupo = remember { (10000..999999).random().toString().uppercase() }
     val categorias = listOf("Familia", "Pareja", "Viaje", "Amigos", "Otro")
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf(categorias[0]) }
@@ -526,7 +527,7 @@ fun CreateGroupDialog(
                     Button(
                         onClick = {
                             if(nombreGrupo.isNotBlank()) {
-                                onCreateConfirm(nombreGrupo, categoriaSeleccionada, codigoGrupo, selectedImageUri?.toString() ?: "")
+                                onCreateConfirm(nombreGrupo, categoriaSeleccionada, codigoGrupo, selectedImageUri)
                             }
                         },
                         modifier = Modifier.weight(1f),

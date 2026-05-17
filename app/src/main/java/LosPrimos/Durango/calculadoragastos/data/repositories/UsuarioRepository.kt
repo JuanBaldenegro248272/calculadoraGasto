@@ -6,7 +6,13 @@ import kotlinx.coroutines.flow.Flow
 
 class UsuarioRepository(private val usuarioDao: UsuarioDao) {
     suspend fun insertarUsuario(usuario: Usuario): Long {
-        return usuarioDao.insertUsuario(usuario)
+        val resultado = usuarioDao.insertUsuario(usuario)
+
+        if (resultado == -1L) {
+            usuarioDao.updateUsuario(usuario)
+        }
+
+        return resultado
     }
 
     suspend fun updateUsuario(usuario: Usuario) {

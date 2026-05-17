@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.FileUpload
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -56,6 +57,8 @@ fun AgregarGastoGrupoScreen(
 
     var monto by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
+    var menuCategorias by remember { mutableStateOf(false) }
+    var categoriaSeleccionada by remember { mutableStateOf("Alimentacion") }
     var fechaLong by remember {
         mutableStateOf(LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
     }
@@ -70,6 +73,13 @@ fun AgregarGastoGrupoScreen(
         gastoExistente?.let { g ->
             monto = g.montoTotal.toString()
             descripcion = g.descripcion
+            categoriaSeleccionada = when (g.idCategoria) {
+                2 -> "Entretenimiento"
+                3 -> "Transporte"
+                4 -> "Alimentacion"
+                5 -> "Salud"
+                else -> "Alimentacion"
+            }
             fechaLong = g.fecha
             if (!g.fotoRecibo.isNullOrBlank()) fotoUri = Uri.parse(g.fotoRecibo)
         }
@@ -110,6 +120,40 @@ fun AgregarGastoGrupoScreen(
                         cursorColor = TealDark
                     )
                 )
+
+                Text("Categoria", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
+                Box {
+                    OutlinedButton(
+                        onClick = { menuCategorias = true },
+                        modifier = Modifier.fillMaxWidth().height(48.dp),
+                        shape = RoundedCornerShape(7.dp)
+                    ) {
+                        Text(
+                            text = categoriaSeleccionada,
+                            color = Color(0xFF363645),
+                            modifier = Modifier.weight(1f)
+                        )
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = "Seleccionar categoria"
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = menuCategorias,
+                        onDismissRequest = { menuCategorias = false }
+                    ) {
+                        listOf("Salud", "Alimentacion", "Transporte", "Entretenimiento").forEach { categoria ->
+                            DropdownMenuItem(
+                                text = { Text(categoria) },
+                                onClick = {
+                                    categoriaSeleccionada = categoria
+                                    menuCategorias = false
+                                }
+                            )
+                        }
+                    }
+                }
 
                 // Descripcion
                 Text("Descripcion", fontWeight = FontWeight.ExtraBold, fontSize = 14.sp, color = Color.Black)
@@ -191,6 +235,12 @@ fun AgregarGastoGrupoScreen(
                             idGrupo      = idGrupo,
                             idUsuarioPagador = usuarioActualId!!,
                             montoTotal   = montoDouble,
+                            idCategoria = when (categoriaSeleccionada) {
+                                "Salud" -> 5
+                                "Transporte" -> 3
+                                "Entretenimiento" -> 2
+                                else -> 4
+                            },
                             descripcion  = descripcion,
                             fecha        = fechaLong,
                             fotoRecibo   = fotoUri?.toString()

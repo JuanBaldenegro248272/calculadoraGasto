@@ -44,6 +44,9 @@ class AppViewModelFactory(
         if (modelClass.isAssignableFrom(GrupoViewModel::class.java)){
             return GrupoViewModel(grupoRepository, dataStoreManager) as T
         }
+        if (modelClass.isAssignableFrom(GastoGrupoViewModel::class.java)){
+            return GastoGrupoViewModel() as T
+        }
         throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")
     }
 }

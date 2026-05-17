@@ -184,7 +184,8 @@ fun AppNavigationController(
                         restoreState = true
                     }
                 },
-                grupoViewModel = grupoViewModel
+                grupoViewModel = grupoViewModel,
+                gastoGrupoViewModel = gastoGrupoViewModel
             )
         }
         composable("graficas") {
@@ -241,6 +242,7 @@ fun AppNavigationController(
             DetalleGrupoScreen(
                 grupoId = id,
                 grupoViewModel = grupoViewModel,
+                gastoGrupoViewModel = gastoGrupoViewModel,
                 onBack = { navController.popBackStack() },
                 onNavigate = { ruta ->
                     navController.navigate(ruta) {
@@ -338,22 +340,6 @@ fun AppNavigationController(
                 onBack = { navController.popBackStack() },
                 ingresoViewModel = ingresoViewModel,
                 idIngresoEditar = idIngreso
-            )
-        }
-
-        composable(
-            route = Screen.DetalleGrupo.route,
-            arguments = listOf(navArgument("grupoId") {
-                type = NavType.StringType
-            })
-        ) { backStackEntry ->
-            val grupoId = backStackEntry.arguments?.getString("grupoId") ?: return@composable
-            DetalleGrupoScreen(
-                idGrupo             = grupoId,
-                onNavigate          = { navController.navigate(it) },
-                onBack              = { navController.popBackStack() },
-                grupoViewModel      = grupoViewModel,
-                gastoGrupoViewModel = gastoGrupoViewModel
             )
         }
 
