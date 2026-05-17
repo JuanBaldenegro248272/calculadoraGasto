@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.ui.screens
 
 import LosPrimos.Durango.calculadoragastos.data.entities.Grupo
+import LosPrimos.Durango.calculadoragastos.navigation.Screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import java.util.UUID
 
 @Composable
@@ -82,17 +84,19 @@ fun GruposScreen(
             if (showCreateDialog) {
                 CreateGroupDialog(
                     onDismiss = { showCreateDialog = false },
-                    onCreateConfirm = { nombre, categoria, codigo ->
-                        val nuevoGrupo = Grupo(
-                            idGrupo = UUID.randomUUID().toString(),
-                            nombre = nombre,
-                            tipo = categoria,
-                            imagenGrupo = "",
-                            codigo = codigo,
-                            idUsuarioCreador = usuarioId,
-                            miembrosIds = listOf(usuarioId)
-                        )
-                        grupoViewModel.crearGrupo(nuevoGrupo)
+                    onCreateConfirm = { nombre, categoria, codigo, imagenUri ->
+                        val uid = FirebaseAuth.getInstance().currentUser?.uid
+                        if (uid != null) {
+                            val nuevoGrupo = Grupo(
+                                nombre = nombre,
+                                tipo = categoria,
+                                imagenGrupo = imagenUri,
+                                codigo = codigo,
+                                idUsuarioCreador = usuarioId,
+                                miembrosIds = listOf(usuarioId)
+                            )
+                            grupoViewModel.crearGrupo(nuevoGrupo)
+                        }
                         showCreateDialog = false
                     }
                 )
@@ -157,7 +161,7 @@ fun GruposScreen(
                                         cantidadMiembros = grupo.miembrosIds.size,
                                         montoTotal = 0.0,
                                         codigoGrupo = grupo.codigo,
-                                        onClick = { onNavigate("detalleGrupo/${grupo.idGrupo}") }
+                                        onClick = { onNavigate(Screen.DetalleGrupo.createRoute(grupo.idGrupo)) }
                                     )
                                 }
                             }

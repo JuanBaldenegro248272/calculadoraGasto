@@ -6,6 +6,7 @@ import LosPrimos.Durango.calculadoragastos.data.repositories.GastoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.PresupuestoRepository
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoFijoScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoGrupoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.HomeScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.LoginScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
@@ -22,6 +23,7 @@ import LosPrimos.Durango.calculadoragastos.viewModel.AppViewModelFactory
 
 import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
+import LosPrimos.Durango.calculadoragastos.viewModel.GastoGrupoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GrupoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
@@ -133,6 +135,7 @@ fun AppNavigationController(
     val categoriaViewModel: CategoriaViewModel = viewModel(factory = factory)
     val presupuestoViewModel: PresupuestoViewModel = viewModel(factory = factory)
     val grupoViewModel: GrupoViewModel = viewModel(factory = factory)
+    val gastoGrupoViewModel: GastoGrupoViewModel = viewModel(factory = factory)
 
     LaunchedEffect(Unit) {
         categoriaViewModel.insertarCategorias()
@@ -228,7 +231,6 @@ fun AppNavigationController(
             )
         }
 
-        // Detalle de Grupo
         composable(
             route = Screen.DetalleGrupo.route,
             arguments = listOf(navArgument("grupoId") {
@@ -337,6 +339,33 @@ fun AppNavigationController(
                 ingresoViewModel = ingresoViewModel,
                 idIngresoEditar = idIngreso
             )
+        }
+
+        composable(
+            route = Screen.DetalleGrupo.route,
+            arguments = listOf(navArgument("grupoId") {
+                type = NavType.StringType
+            })
+        ) { backStackEntry ->
+            val grupoId = backStackEntry.arguments?.getString("grupoId") ?: return@composable
+            DetalleGrupoScreen(
+                idGrupo             = grupoId,
+                onNavigate          = { navController.navigate(it) },
+                onBack              = { navController.popBackStack() },
+                grupoViewModel      = grupoViewModel,
+                gastoGrupoViewModel = gastoGrupoViewModel
+            )
+        }
+
+        composable("agregarGastoGrupo/{idGrupo}") { backStackEntry ->
+            val idGrupo = backStackEntry.arguments?.getString("idGrupo") ?: return@composable
+            AgregarGastoGrupoScreen(idGrupo = idGrupo, onBack = { navController.popBackStack() }, gastoGrupoViewModel = gastoGrupoViewModel)
+        }
+
+        composable("editarGastoGrupo/{idGrupo}/{idGastoGrupo}") { backStackEntry ->
+            val idGrupo      = backStackEntry.arguments?.getString("idGrupo") ?: return@composable
+            val idGastoEditar = backStackEntry.arguments?.getString("idGastoGrupo")
+            AgregarGastoGrupoScreen(idGrupo = idGrupo, idGastoEditar = idGastoEditar, onBack = { navController.popBackStack() }, gastoGrupoViewModel = gastoGrupoViewModel)
         }
     }
 }
