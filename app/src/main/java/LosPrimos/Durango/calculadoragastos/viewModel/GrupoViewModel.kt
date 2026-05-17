@@ -16,6 +16,9 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
     var grupos by mutableStateOf<List<Grupo>>(emptyList())
         private set
 
+    var grupoSeleccionado by mutableStateOf<Grupo?>(null)
+        private set
+
     var errorMessage by mutableStateOf<String?>(null)
         private set
 
@@ -44,6 +47,20 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
             usuarioId = usuarioId,
             onResult = { lista ->
                 grupos = lista
+            },
+            onError = { exception ->
+                errorMessage = exception.message
+            }
+        )
+    }
+
+    fun obtenerGrupoPorId(grupoId: String) {
+        if (grupoId.isBlank()) return
+
+        repository.obtenerGrupoPorId(
+            grupoId = grupoId,
+            onResult = { grupo ->
+                grupoSeleccionado = grupo
             },
             onError = { exception ->
                 errorMessage = exception.message

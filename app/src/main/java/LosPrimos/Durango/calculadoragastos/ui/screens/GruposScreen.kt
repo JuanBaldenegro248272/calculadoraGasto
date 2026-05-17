@@ -38,7 +38,7 @@ fun GruposScreen(
 ) {
     val usuarioActualId by grupoViewModel.usuarioActualId.collectAsState()
     val usuarioId = usuarioActualId ?: ""
-    val isOffline = true
+    val isOffline = false
     var showJoinDialog by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
     val grupos = grupoViewModel.grupos
@@ -148,6 +148,7 @@ fun GruposScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
+<<<<<<< Updated upstream
                     BottomRoundedSurface {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
@@ -164,6 +165,22 @@ fun GruposScreen(
                                         onClick = { onNavigate(Screen.DetalleGrupo.createRoute(grupo.idGrupo)) }
                                     )
                                 }
+=======
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 80.dp)
+                    ) {
+                        grupos.forEach { grupo ->
+                            item {
+                                GroupCardItem(
+                                    titulo = grupo.nombre,
+                                    categoriaGrupo = grupo.tipo,
+                                    cantidadMiembros = grupo.miembrosIds.size,
+                                    montoTotal = 0.0,
+                                    codigoGrupo = grupo.codigo,
+                                    onClick = { onNavigate("detalleGrupo/${grupo.idGrupo}") }
+                                )
+>>>>>>> Stashed changes
                             }
                         }
                     }

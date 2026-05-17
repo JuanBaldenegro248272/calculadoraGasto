@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.ui.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.ui.window.Dialog
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material.icons.filled.PersonAdd
@@ -40,8 +42,8 @@ fun GroupsTopBar() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Grupos",
-            fontSize = 28.sp,
+            text = "Mis Grupos",
+            fontSize = 30.sp,
             fontWeight = FontWeight.ExtraBold,
             color = Color.White
         )
@@ -97,7 +99,7 @@ fun GroupActionButtons(
 }
 
 @Composable
-fun GroupCardItem(
+fun GroupCardItemViejo(
     titulo: String,
     categoriaGrupo: String,
     cantidadMiembros: Int,
@@ -174,6 +176,134 @@ fun GroupCardItem(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun GroupCardItem(
+    titulo: String,
+    categoriaGrupo: String,
+    cantidadMiembros: Int,
+    montoTotal: Double,
+    codigoGrupo: String,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        border = BorderStroke(1.dp, LightBlueGray.copy(alpha = 0.55f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(26.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column {
+                    Text(
+                        text = titulo,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 16.sp,
+                        color = Color.Black
+                    )
+                    Text(
+                        text = categoriaGrupo,
+                        color = DarkGrayText.copy(alpha = 0.75f),
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+
+                Surface(
+                    color = DarkGrayText,
+                    shape = RoundedCornerShape(14.dp),
+                    shadowElevation = 4.dp
+                ) {
+                    Text(
+                        text = "$cantidadMiembros Miembros",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(54.dp))
+
+            FilaDatoGrupo(
+                titulo = "Total Gastado",
+                valor = "$${"%.2f".format(montoTotal)}",
+                colorValor = DarkGrayText.copy(alpha = 0.65f)
+            )
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            FilaDatoGrupo(
+                titulo = "Mi deuda",
+                valor = "$0.00",
+                colorValor = MagentaPink
+            )
+
+            Divider(
+                modifier = Modifier.padding(vertical = 14.dp),
+                color = LightBlueGray.copy(alpha = 0.35f),
+                thickness = 4.dp
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Codigo: $codigoGrupo",
+                    color = DarkGrayText,
+                    fontSize = 14.sp
+                )
+
+                Icon(
+                    imageVector = Icons.Default.ContentCopy,
+                    contentDescription = "Copiar codigo",
+                    tint = DarkGrayText.copy(alpha = 0.75f),
+                    modifier = Modifier.size(26.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilaDatoGrupo(
+    titulo: String,
+    valor: String,
+    colorValor: Color
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = titulo,
+            color = DarkGrayText,
+            fontSize = 14.sp
+        )
+        Text(
+            text = valor,
+            color = colorValor,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.ExtraBold
+        )
     }
 }
 

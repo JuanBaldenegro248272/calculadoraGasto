@@ -31,6 +31,18 @@ class GrupoRepository {
             }
     }
 
+    fun obtenerGrupoPorId(grupoId: String, onResult: (Grupo?) -> Unit, onError: (Exception) -> Unit) {
+        db.collection("grupos").document(grupoId)
+            .get()
+            .addOnSuccessListener { documento ->
+                val grupo = documento.toObject(Grupo::class.java)
+                onResult(grupo)
+            }
+            .addOnFailureListener { exception ->
+                onError(exception)
+            }
+    }
+
     fun unirseAGrupoPorCodigo(codigo: String, usuarioId: String, onSuccess: () -> Unit, onError: (Exception) -> Unit) {
         db.collection("grupos")
             .whereEqualTo("codigo", codigo)
