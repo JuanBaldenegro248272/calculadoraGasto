@@ -35,9 +35,9 @@ fun PerfilScreen(
     var generoEdit by remember { mutableStateOf("") }
     var fechaEdit by remember { mutableStateOf(0L) }
 
-    var isDarkMode by remember { mutableStateOf(false) }
     var isBiometricEnabled by remember { mutableStateOf(true) }
 
+    val isDarkMode by viewModel.isDarkMode.collectAsState()
 
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -171,7 +171,7 @@ fun PerfilScreen(
                                 title = "Tema Oscuro",
                                 icon = Icons.Default.NightsStay,
                                 isChecked = isDarkMode,
-                                onCheckedChange = { isDarkMode = it }
+                                onCheckedChange = { viewModel.toggleDarkMode(it) }
                             )
 
                             ProfileSwitchItem(

@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.data
 
 import android.content.Context
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -15,6 +16,18 @@ class DataStoreManager(private val context: Context) {
     companion object {
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         val USER_ID = stringPreferencesKey("user_id")
+
+        val DARK_MODE_KEY = booleanPreferencesKey("dark_mode")
+    }
+
+    val darkModeFlow: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[DARK_MODE_KEY] ?: false
+    }
+
+    suspend fun setDarkMode(isDark: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[DARK_MODE_KEY] = isDark
+        }
     }
 
     val isLoggedInFlow: Flow<Boolean> = context.dataStore.data

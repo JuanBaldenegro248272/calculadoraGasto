@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import LosPrimos.Durango.calculadoragastos.data.entities.Usuario
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import LosPrimos.Durango.calculadoragastos.data.DataStoreManager
+import androidx.datastore.dataStore
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -20,6 +21,18 @@ class PerfilViewModel(
             if (id != null) repository.obtenerUsuarioPorId(id) else flowOf(null)
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
+    val isDarkMode = dataStoreManager.darkModeFlow.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
+    )
+
+    fun toggleDarkMode(isDark: Boolean) {
+        viewModelScope.launch {
+            dataStoreManager.setDarkMode(isDark)
+        }
+    }
 
     fun actualizarPerfil(nombre: String, genero: String, fechaNac: Long) {
         val usuarioActual = usuarioState.value ?: return

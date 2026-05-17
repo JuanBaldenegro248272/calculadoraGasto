@@ -95,7 +95,7 @@ fun BalanceSummarySection(
 
         Text(
             text = textoPresupuesto,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             fontSize = 12.sp,
             modifier = Modifier.padding(bottom = 4.dp)
         )
@@ -204,7 +204,7 @@ private fun TransactionTypeToggle(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.White, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
             .padding(4.dp)
     ) {
         Box(
@@ -218,7 +218,7 @@ private fun TransactionTypeToggle(
         ) {
             Text(
                 text = "Gastos",
-                color = if (isGastosSelected) Color.White else DarkGrayText,
+                color = if (isGastosSelected) MaterialTheme.colorScheme.surface else DarkGrayText,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
@@ -235,7 +235,7 @@ private fun TransactionTypeToggle(
         ) {
             Text(
                 text = "Ingresos",
-                color = if (!isGastosSelected) Color.White else DarkGrayText,
+                color = if (!isGastosSelected) MaterialTheme.colorScheme.surface else DarkGrayText,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp
             )
@@ -361,7 +361,7 @@ fun OfflineStatusBar() {
         ) {
             Text(
                 text = "SIN CONEXIÓN",
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.ExtraBold,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp),
@@ -438,8 +438,8 @@ fun FormDateField(
                 modifier = Modifier.fillMaxWidth().height(58.dp),
                 shape = RoundedCornerShape(7.dp),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                     focusedIndicatorColor = TealDark,
                     unfocusedIndicatorColor = Color(0xFFC8C2D2),
                     focusedTextColor = Color(0xFF363645),
@@ -468,7 +468,7 @@ fun FormDateField(
             dismissButton = {
                 TextButton(onClick = { showDialog = false }) { Text("Cancelar", color = DarkGrayText) }
             },
-            colors = DatePickerDefaults.colors(containerColor = Color.White)
+            colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             DatePicker(state = datePickerState)
         }

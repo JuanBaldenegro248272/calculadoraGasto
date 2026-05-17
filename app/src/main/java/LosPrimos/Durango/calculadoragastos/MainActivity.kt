@@ -10,7 +10,6 @@ import LosPrimos.Durango.calculadoragastos.data.repositories.PresupuestoReposito
 import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import LosPrimos.Durango.calculadoragastos.navigation.AppNavigationController
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,8 +20,11 @@ import LosPrimos.Durango.calculadoragastos.viewModel.AuthViewModel
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 
@@ -35,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         val database = SpentDatabase.getDatabase(applicationContext)
         val usuarioRepository = UsuarioRepository(database.usuarioDao())
         val gastoRepository = GastoRepository(database.gastoDao())
-        val dataStoreManager = DataStoreManager(applicationContext)
+        val dataStoreManager = DataStoreManager(this)
         val ingresoRepository = IngresoRepository(database.ingresoDao())
         val categoriaRepository = CategoriaRepository(database.categoriaDao())
         val presupuestoRepository = PresupuestoRepository(database.presupuestoDao())
@@ -52,9 +54,11 @@ class MainActivity : AppCompatActivity() {
         )
 
         setContent {
-            CalculadoraGastosTheme {
+            val isDarkMode by dataStoreManager.darkModeFlow.collectAsState(
+                initial = isSystemInDarkTheme()
+            )
+            CalculadoraGastosTheme(darkTheme = isDarkMode) {
                 val navController = rememberNavController()
-
                 val authViewModel: AuthViewModel = viewModel(factory = appViewModelFactory)
 
                 Surface(
@@ -71,3 +75,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
+
+
