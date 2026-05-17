@@ -14,6 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.CameraAlt
@@ -25,6 +28,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
 
 @Composable
 fun GroupsTopBar() {
@@ -253,13 +258,20 @@ fun JoinGroupDialog(
 @Composable
 fun CreateGroupDialog(
     onDismiss: () -> Unit,
-    onCreateConfirm: (nombre: String, categoria: String, codigo: String) -> Unit
+    onCreateConfirm: (nombre: String, categoria: String, codigo: String, imagenUri: String) -> Unit
 ) {
     var nombreGrupo by remember { mutableStateOf("") }
     val codigoGrupo = remember { (10000..999999).random().toString() }
     val categorias = listOf("Familia", "Pareja", "Viaje", "Amigos", "Otro")
     var isDropdownExpanded by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf(categorias[0]) }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        selectedImageUri = uri
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -284,18 +296,27 @@ fun CreateGroupDialog(
 
                 Box(
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(100.dp)
                         .clip(CircleShape)
-                        .background(BackgroundLight)
-                        .clickable {  },
+                        .background(Color(0xFFEEEEEE))
+                        .clickable { galleryLauncher.launch("image/*") }, // Abrir galería al tocar
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CameraAlt,
-                        contentDescription = "Agregar Foto",
-                        tint = LightBlueGray,
-                        modifier = Modifier.size(32.dp)
-                    )
+                    if (selectedImageUri != null) {
+                        AsyncImage(
+                            model = selectedImageUri,
+                            contentDescription = "Foto del grupo",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.CameraAlt,
+                            contentDescription = "Agregar imagen",
+                            tint = Color.Gray,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -375,7 +396,7 @@ fun CreateGroupDialog(
                     Button(
                         onClick = {
                             if(nombreGrupo.isNotBlank()) {
-                                onCreateConfirm(nombreGrupo, categoriaSeleccionada, codigoGrupo)
+                                onCreateConfirm(nombreGrupo, categoriaSeleccionada, codigoGrupo, selectedImageUri?.toString() ?: "")
                             }
                         },
                         modifier = Modifier.weight(1f),
