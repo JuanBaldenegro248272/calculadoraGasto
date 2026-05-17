@@ -43,7 +43,7 @@ abstract class SpentDatabase : RoomDatabase() {
                     context.applicationContext,
                     LosPrimos.Durango.calculadoragastos.data.SpentDatabase::class.java,
                     "spent_database"
-                ).fallbackToDestructiveMigration().build()
+                ).build()
                 INSTANCE = instance
                 instance
             }
