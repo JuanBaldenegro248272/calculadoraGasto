@@ -12,6 +12,7 @@ import LosPrimos.Durango.calculadoragastos.ui.screens.RegisterScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarGastoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoFijoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.AgregarIngresoScreen
+import LosPrimos.Durango.calculadoragastos.ui.screens.DetalleGrupoScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GraficasScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.GruposScreen
 import LosPrimos.Durango.calculadoragastos.ui.screens.PerfilScreen
@@ -235,6 +236,17 @@ fun AppNavigationController(
             })
         ) { backStackEntry ->
             val id = backStackEntry.arguments?.getString("grupoId") ?: ""
+            DetalleGrupoScreen(
+                grupoId = id,
+                grupoViewModel = grupoViewModel,
+                onBack = { navController.popBackStack() },
+                onNavigate = { ruta ->
+                    navController.navigate(ruta) {
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            )
         }
 
         // Formulario de Gasto (Individual o Grupo)
