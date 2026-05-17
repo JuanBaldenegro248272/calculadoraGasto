@@ -23,8 +23,8 @@ class PresupuestoViewModel(private val repository : PresupuestoRepository, dataS
             repository.insertarPresupuesto(presupuesto)
         }
     }
-    
-    fun obtenerPresupuesto(usuarioId: Int): Flow<List<Presupuesto>> {
+
+    fun obtenerPresupuesto(usuarioId: String): Flow<List<Presupuesto>> {
         return repository.obtenerPresupuestos(usuarioId)
     }
 }

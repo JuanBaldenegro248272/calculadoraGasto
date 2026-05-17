@@ -33,7 +33,7 @@ fun GraficasScreen(
     categoriaViewModel: CategoriaViewModel
 ) {
     val usuarioActualId by ingresoViewModel.usuarioActualId.collectAsState()
-    val usuarioId = usuarioActualId ?: 0
+    val usuarioId = usuarioActualId ?: ""
 
     val gastos by gastoViewModel.obtenerGastosPorUsuario(usuarioId)
         .collectAsState(initial = emptyList())

@@ -6,6 +6,7 @@ import LosPrimos.Durango.calculadoragastos.data.repositories.UsuarioRepository
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -16,9 +17,13 @@ sealed class AuthState {
     data class Error(val message: String) : AuthState()
 }
 
-class AuthViewModel(private val usuarioRepository: UsuarioRepository, private val dataStore: DataStoreManager): ViewModel() {
+class AuthViewModel(
+    private val usuarioRepository: UsuarioRepository,
+    private val dataStore: DataStoreManager
+): ViewModel() {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     private val _sesionVerificada = MutableStateFlow(false)
     val sesionVerificada: StateFlow<Boolean> = _sesionVerificada.asStateFlow()
@@ -54,10 +59,31 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val uid = task.result?.user?.uid ?: ""
-                    viewModelScope.launch {
-                        dataStore.saveSession(uid)
-                        _authState.value = AuthState.Success(uid)
-                    }
+
+                    db.collection("usuarios").document(uid).get()
+                        .addOnSuccessListener { document ->
+                            if (document.exists()) {
+                                val usuarioNube = document.toObject(Usuario::class.java)
+
+                                if (usuarioNube != null) {
+                                    viewModelScope.launch {
+                                        val usuarioParaLocal = usuarioNube.copy(hashContrasena = contrasena)
+                                        usuarioRepository.insertarUsuario(usuarioParaLocal)
+
+                                        dataStore.saveSession(uid)
+                                        _authState.value = AuthState.Success(uid)
+                                    }
+                                } else {
+                                    _authState.value = AuthState.Error("Perfil de usuario corrupto.")
+                                }
+                            } else {
+                                _authState.value = AuthState.Error("El perfil no existe en la base de datos.")
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            _authState.value = AuthState.Error("Error al recuperar el perfil: ${e.message}")
+                        }
+
                 } else {
                     _authState.value = AuthState.Error(task.exception?.message ?: "Error al iniciar sesión")
                 }
@@ -81,18 +107,27 @@ class AuthViewModel(private val usuarioRepository: UsuarioRepository, private va
                         idUsuario = uid,
                         nombre = nombre,
                         correo = correo,
-                        hashContrasena = contrasena,
+                        hashContrasena = "",
                         fechaNacimiento = fechaNacimiento,
                         genero = genero,
                         fotoPerfil = null,
                         fechaRegistro = System.currentTimeMillis()
                     )
 
-                    viewModelScope.launch {
-                        usuarioRepository.insertarUsuario(nuevoUsuario)
-                        dataStore.saveSession(uid)
-                        _authState.value = AuthState.Success(uid)
-                    }
+                    db.collection("usuarios").document(uid).set(nuevoUsuario)
+                        .addOnSuccessListener {
+
+                            viewModelScope.launch {
+                                val usuarioLocal = nuevoUsuario.copy(hashContrasena = contrasena)
+                                usuarioRepository.insertarUsuario(usuarioLocal)
+                                dataStore.saveSession(uid)
+                                _authState.value = AuthState.Success(uid)
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            _authState.value = AuthState.Error("Error al guardar el perfil: ${e.message}")
+                        }
+
                 } else {
                     _authState.value = AuthState.Error(task.exception?.message ?: "Error al registrar usuario")
                 }

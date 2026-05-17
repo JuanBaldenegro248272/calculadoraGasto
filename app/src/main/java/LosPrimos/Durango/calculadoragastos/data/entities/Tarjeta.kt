@@ -18,10 +18,9 @@ import androidx.room.PrimaryKey
         Index("idUsuario")
     ])
 data class Tarjeta(
-    @PrimaryKey(autoGenerate = true)
-    val idTarjeta: Int,
+    @PrimaryKey(autoGenerate = true) val idTarjeta: Int,
     val nombreTarjeta: String,
     val numeroTarjeta: String,
     val ultimoCuatro: String,
-    val idUsuario: Int
+    val idUsuario: String
 )

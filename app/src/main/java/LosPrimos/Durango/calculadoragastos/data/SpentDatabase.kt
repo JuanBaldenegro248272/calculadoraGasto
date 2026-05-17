@@ -7,6 +7,8 @@ import LosPrimos.Durango.calculadoragastos.data.daos.PresupuestoDao
 import LosPrimos.Durango.calculadoragastos.data.daos.UsuarioDao
 import LosPrimos.Durango.calculadoragastos.data.entities.Categoria
 import LosPrimos.Durango.calculadoragastos.data.entities.Gasto
+import LosPrimos.Durango.calculadoragastos.data.entities.GastoGrupo
+import LosPrimos.Durango.calculadoragastos.data.entities.Grupo
 import LosPrimos.Durango.calculadoragastos.data.entities.Ingreso
 import LosPrimos.Durango.calculadoragastos.data.entities.Presupuesto
 import LosPrimos.Durango.calculadoragastos.data.entities.Tarjeta
@@ -22,8 +24,9 @@ import androidx.room.RoomDatabase
     Ingreso::class,
     Categoria::class,
     Tarjeta::class,
-    Presupuesto::class], version = 7, exportSchema = false)
-abstract class SpentDatabase : RoomDatabase(){
+    Presupuesto::class
+], version = 8, exportSchema = false)
+abstract class SpentDatabase : RoomDatabase() {
     abstract fun usuarioDao(): UsuarioDao
     abstract fun gastoDao(): GastoDao
     abstract fun ingresoDao(): IngresoDao

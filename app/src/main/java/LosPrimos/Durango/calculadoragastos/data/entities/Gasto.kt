@@ -9,44 +9,21 @@ import androidx.room.Index
 @Entity(
     tableName = "gastos",
     foreignKeys = [
-        ForeignKey(
-            entity = Usuario::class,
-            parentColumns = ["idUsuario"],
-            childColumns = ["idUsuarioPaga"],
-            onDelete = ForeignKey.CASCADE
-        ),
-        ForeignKey(
-            entity = Categoria::class,
-            parentColumns = ["idCategoria"],
-            childColumns = ["idCategoria"],
-            onDelete = ForeignKey.RESTRICT
-        ),
-//        ForeignKey(
-//            entity = Grupo::class,
-//            parentColumns = ["idGrupo"],
-//            childColumns = ["idGrupo"],
-//            onDelete = ForeignKey.SET_NULL
-//        ),
-        ForeignKey(
-            entity = Tarjeta::class,
-            parentColumns = ["idTarjeta"],
-            childColumns = ["idTarjeta"],
-            onDelete = ForeignKey.SET_NULL
-        )
+        ForeignKey(entity = Usuario::class, parentColumns = ["idUsuario"], childColumns = ["idUsuarioPaga"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(entity = Categoria::class, parentColumns = ["idCategoria"], childColumns = ["idCategoria"], onDelete = ForeignKey.RESTRICT),
+        ForeignKey(entity = Tarjeta::class, parentColumns = ["idTarjeta"], childColumns = ["idTarjeta"], onDelete = ForeignKey.SET_NULL)
     ],
-    indices = [
-        Index("idUsuarioPaga"),
-        Index("idCategoria"),
-        Index("idGrupo"),
-        Index("idTarjeta")
-    ]
+    indices = [Index("idUsuarioPaga"), Index("idCategoria"), Index("idTarjeta")]
 )
 data class Gasto(
-    @PrimaryKey
-    val idGasto: String,
+    @PrimaryKey(autoGenerate = true)
+    val idGasto: Int,
     val idUsuarioPaga: String,
     val idCategoria: Int?,
+
     val idGrupo: String?,
+    val idGastoGrupo: String?,
+
     val idTarjeta: Int?,
     val monto: Double,
     val descripcion: String,

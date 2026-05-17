@@ -21,17 +21,17 @@ class IngresoRepository(private val ingresoDao: IngresoDao){
 
     suspend fun obtenerIngresoPorId(id: Int): Ingreso? = ingresoDao.getIngresoById(id)
 
-     fun obtenerIngresosPorUsuario(idUsuario: Int): Flow<List<Ingreso>> {
+    fun obtenerIngresosPorUsuario(idUsuario: String): Flow<List<Ingreso>> {
         return ingresoDao.getIngresosByUsuario(idUsuario)
     }
 
-    fun obtenerIngresosFijosPorUsuario(idUsuario: Int): Flow<List<Ingreso>> {
+    fun obtenerIngresosFijosPorUsuario(idUsuario: String): Flow<List<Ingreso>> {
         return ingresoDao.getIngresosFijosByUsuario(idUsuario)
     }
 
-     fun obtenerSumaIngresos(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?> =
+    fun obtenerSumaIngresos(idUsuario: String, inicio: Long, fin: Long): Flow<Double?> =
         ingresoDao.getSumaIngresosPorPeriodo(idUsuario, inicio, fin)
 
-     fun obtenerListaIngresos(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Ingreso>> =
+    fun obtenerListaIngresos(idUsuario: String, inicio: Long, fin: Long): Flow<List<Ingreso>> =
         ingresoDao.getIngresosPorPeriodo(idUsuario, inicio, fin)
 }

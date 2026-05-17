@@ -37,11 +37,11 @@ class IngresoViewModel(private val repository: IngresoRepository, dataStore: Dat
         return repository.obtenerIngresoPorId(id)
     }
 
-    fun obtenerIngresosPorUsuario(idUsuario: Int?): Flow<List<Ingreso>> {
-            return repository.obtenerIngresosPorUsuario(idUsuario ?: 0)
+    fun obtenerIngresosPorUsuario(idUsuario: String?): Flow<List<Ingreso>> {
+        return repository.obtenerIngresosPorUsuario(idUsuario ?: "")
     }
 
-    fun obtenerIngresosFijosPorUsuario(usuarioId: Int?): Flow<List<Ingreso>> {
-        return repository.obtenerIngresosFijosPorUsuario(usuarioId ?: 0)
+    fun obtenerIngresosFijosPorUsuario(usuarioId: String?): Flow<List<Ingreso>> {
+        return repository.obtenerIngresosFijosPorUsuario(usuarioId ?: "")
     }
 }

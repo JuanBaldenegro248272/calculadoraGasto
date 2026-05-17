@@ -18,7 +18,7 @@ class PresupuestoRepository(private val presupuestoDao: PresupuestoDao){
         presupuestoDao.updatePresupuesto(presupuesto)
     }
 
-    fun obtenerPresupuestos(idUsuario: Int): Flow<List<Presupuesto>> {
+    fun obtenerPresupuestos(idUsuario: String): Flow<List<Presupuesto>> {
         return presupuestoDao.obtenerPresupuestosPorUsuario(idUsuario)
     }
 }

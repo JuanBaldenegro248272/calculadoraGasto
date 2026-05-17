@@ -16,15 +16,19 @@ interface GastoDao {
 
     @Query("SELECT * FROM gastos WHERE idGasto = :id")
     suspend fun getGastoById(id: Int): Gasto?
+
     @Query("SELECT * FROM gastos WHERE idUsuarioPaga = :idUsuario ORDER BY fecha DESC")
-    fun getGastosByUsuario(idUsuario: Int): Flow<List<Gasto>>
+    fun getGastosByUsuario(idUsuario: String): Flow<List<Gasto>>
+
     @Query("SELECT SUM(monto) FROM gastos WHERE idUsuarioPaga = :idUsuario AND fecha BETWEEN :inicio AND :fin")
-    fun getSumaGastosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<Double?>
+    fun getSumaGastosPorPeriodo(idUsuario: String, inicio: Long, fin: Long): Flow<Double?>
+
     @Query("SELECT * FROM gastos WHERE idUsuarioPaga = :idUsuario AND fecha BETWEEN :inicio AND :fin ORDER BY fecha DESC")
-    fun getGastosPorPeriodo(idUsuario: Int, inicio: Long, fin: Long): Flow<List<Gasto>>
+    fun getGastosPorPeriodo(idUsuario: String, inicio: Long, fin: Long): Flow<List<Gasto>>
+
     @Query("SELECT * FROM gastos WHERE idGrupo = :idGrupo ORDER BY fecha DESC")
-    fun getGastosByGrupo(idGrupo: Int): Flow<List<Gasto>>
+    fun getGastosByGrupo(idGrupo: String): Flow<List<Gasto>>
 
     @Query("SELECT * FROM gastos WHERE idUsuarioPaga = :idUsuario AND esFijo = 1 ORDER BY fecha DESC")
-    fun getGastosFijosByUsuario(idUsuario: Int): Flow<List<Gasto>>
+    fun getGastosFijosByUsuario(idUsuario: String): Flow<List<Gasto>>
 }

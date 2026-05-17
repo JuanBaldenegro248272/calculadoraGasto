@@ -16,6 +16,9 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
     var grupos by mutableStateOf<List<Grupo>>(emptyList())
         private set
 
+    var errorMessage by mutableStateOf<String?>(null)
+        private set
+
     val usuarioActualId = dataStore.userIdFlow.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
@@ -23,10 +26,48 @@ class GrupoViewModel(private val repository: GrupoRepository, dataStore: DataSto
     )
 
     fun crearGrupo(grupo: Grupo){
-        repository.crearGrupo(grupo)
+        repository.crearGrupo(
+            grupo = grupo,
+            onSuccess = {
+                obtenerGrupos(usuarioActualId.value)
+            },
+            onError = { exception ->
+                errorMessage = exception.message
+            }
+        )
     }
 
-    fun obtenerGrupos(usuarioId: Int?){
-        repository.obtenerGrupos(usuarioId){lista -> grupos = lista}
+    fun obtenerGrupos(usuarioId: String?){
+        if (usuarioId.isNullOrBlank()) return
+
+        repository.obtenerGrupos(
+            usuarioId = usuarioId,
+            onResult = { lista ->
+                grupos = lista
+            },
+            onError = { exception ->
+                errorMessage = exception.message
+            }
+        )
     }
+
+    fun unirseAGrupo(codigo: String, usuarioId: String) {
+        if (codigo.isBlank() || usuarioId.isBlank()) return
+
+        repository.unirseAGrupoPorCodigo(
+            codigo = codigo,
+            usuarioId = usuarioId,
+            onSuccess = {
+                obtenerGrupos(usuarioId)
+            },
+            onError = { exception ->
+                errorMessage = exception.message
+            }
+        )
+    }
+
+
+
+
+
 }

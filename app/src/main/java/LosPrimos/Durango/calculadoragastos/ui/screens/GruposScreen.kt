@@ -27,13 +27,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import java.util.UUID
 
 @Composable
 fun GruposScreen(
     onNavigate: (String) -> Unit,
     grupoViewModel: GrupoViewModel
 ) {
-    val usuarioId by grupoViewModel.usuarioActualId.collectAsState()
+    val usuarioActualId by grupoViewModel.usuarioActualId.collectAsState()
+    val usuarioId = usuarioActualId ?: ""
     val isOffline = true
     var showJoinDialog by remember { mutableStateOf(false) }
     var showCreateDialog by remember { mutableStateOf(false) }
@@ -47,10 +49,11 @@ fun GruposScreen(
 
 
     LaunchedEffect(usuarioId) {
-        if (usuarioId != 0){
+        if (usuarioId.isNotBlank()) {
             grupoViewModel.obtenerGrupos(usuarioId)
         }
     }
+
     Scaffold(
         bottomBar = {
             SpentBottomNavigation(
@@ -70,24 +73,24 @@ fun GruposScreen(
                 JoinGroupDialog(
                     onDismiss = { showJoinDialog = false },
                     onJoinConfirm = { codigoIngresado ->
-                        println("El usuario intentó unirse con el código: $codigoIngresado")
+                        grupoViewModel.unirseAGrupo(codigoIngresado, usuarioId)
                         showJoinDialog = false
                     }
                 )
             }
-
 
             if (showCreateDialog) {
                 CreateGroupDialog(
                     onDismiss = { showCreateDialog = false },
                     onCreateConfirm = { nombre, categoria, codigo ->
                         val nuevoGrupo = Grupo(
+                            idGrupo = UUID.randomUUID().toString(),
                             nombre = nombre,
                             tipo = categoria,
                             imagenGrupo = "",
                             codigo = codigo,
-                            idUsuario = usuarioId,
-                            miembros = listOf(usuarioId)
+                            idUsuarioCreador = usuarioId,
+                            miembrosIds = listOf(usuarioId)
                         )
                         grupoViewModel.crearGrupo(nuevoGrupo)
                         showCreateDialog = false
@@ -121,41 +124,42 @@ fun GruposScreen(
                     )
                 }
             } else {
-            Column(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize()) {
 
-                if (isOffline) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        OfflineStatusBar()
+                    if (isOffline) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            OfflineStatusBar()
+                        }
                     }
-                }
 
-                GroupsTopBar()
+                    GroupsTopBar()
 
-                GroupActionButtons(
-                    onCreateClick = { showCreateDialog = true },
-                    onJoinClick = { showJoinDialog = true }
-                )
+                    GroupActionButtons(
+                        onCreateClick = { showCreateDialog = true },
+                        onJoinClick = { showJoinDialog = true }
+                    )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                BottomRoundedSurface {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
-                    ) {
-                        grupos.forEach { grupo ->
-                            item {
-                                GroupCardItem(
-                                    titulo = grupo.nombre,
-                                    categoriaGrupo = grupo.tipo,
-                                    cantidadMiembros = grupo.miembros.size,
-                                    montoTotal = 0.0,
-                                    codigoGrupo = grupo.codigo,
-                                    onClick = { onNavigate("detalleGrupo/1") }
-                                )
+                    BottomRoundedSurface {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(top = 16.dp, bottom = 80.dp)
+                        ) {
+                            grupos.forEach { grupo ->
+                                item {
+                                    GroupCardItem(
+                                        titulo = grupo.nombre,
+                                        categoriaGrupo = grupo.tipo,
+                                        cantidadMiembros = grupo.miembrosIds.size,
+                                        montoTotal = 0.0,
+                                        codigoGrupo = grupo.codigo,
+                                        onClick = { onNavigate("detalleGrupo/${grupo.idGrupo}") }
+                                    )
+                                }
                             }
                         }
                     }
@@ -164,4 +168,3 @@ fun GruposScreen(
         }
     }
 }
-    }

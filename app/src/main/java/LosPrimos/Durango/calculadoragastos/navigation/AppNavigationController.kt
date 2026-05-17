@@ -257,12 +257,9 @@ fun AppNavigationController(
 
         composable(
             route = Screen.EditarGasto.route,
-            arguments = listOf(navArgument("idGasto") {
-                type = NavType.StringType
-            })
+            arguments = listOf(navArgument("idGasto") { type = NavType.StringType })
         ) { backStackEntry ->
-            val idGasto =
-                backStackEntry.arguments?.getString("idGasto") ?: return@composable
+            val idGasto = backStackEntry.arguments?.getString("idGasto")?.toIntOrNull() ?: return@composable
             AgregarGastoScreen(
                 onBack = { navController.popBackStack() },
                 gastoviewModel = gastoViewModel,
@@ -294,12 +291,9 @@ fun AppNavigationController(
 
         composable(
             route = Screen.EditarGastoFijo.route,
-            arguments = listOf(navArgument("idGasto") {
-                type = NavType.StringType
-            })
+            arguments = listOf(navArgument("idGasto") { type = NavType.StringType })
         ) { backStackEntry ->
-            val idGasto =
-                backStackEntry.arguments?.getString("idGasto") ?: return@composable
+            val idGasto = backStackEntry.arguments?.getString("idGasto")?.toIntOrNull() ?: return@composable
 
             AgregarGastoFijoScreen(
                 onBack = { navController.popBackStack() },
@@ -310,12 +304,9 @@ fun AppNavigationController(
 
         composable(
             route = Screen.EditarIngresoFijo.route,
-            arguments = listOf(navArgument("idIngreso") {
-                type = NavType.StringType
-            })
+            arguments = listOf(navArgument("idIngreso") { type = NavType.StringType })
         ) { backStackEntry ->
-            val idIngreso = backStackEntry.arguments?.getString("idIngreso")
-                ?: return@composable
+            val idIngreso = backStackEntry.arguments?.getString("idIngreso")?.toIntOrNull() ?: return@composable
 
             AgregarIngresoFijoScreen(
                 onBack = { navController.popBackStack() },
@@ -326,12 +317,9 @@ fun AppNavigationController(
 
         composable(
             route = Screen.EditarIngreso.route,
-            arguments = listOf(navArgument("idIngreso") {
-                type = NavType.StringType
-            })
+            arguments = listOf(navArgument("idIngreso") { type = NavType.StringType })
         ) { backStackEntry ->
-            val idIngreso = backStackEntry.arguments?.getString("idIngreso")
-                ?: return@composable
+            val idIngreso = backStackEntry.arguments?.getString("idIngreso")?.toIntOrNull() ?: return@composable
             AgregarIngresoScreen(
                 onBack = { navController.popBackStack() },
                 ingresoViewModel = ingresoViewModel,

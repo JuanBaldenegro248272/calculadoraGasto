@@ -236,10 +236,10 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel,
                     AsyncImage(
                         model = fotoUri,
                         contentDescription = "Vista previa del comprobante",
-                        contentScale = ContentScale.Crop, // Recorta la imagen para llenar el rectángulo
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp) // Altura de la vista previa
+                            .height(200.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .border(1.dp, Color(0xFFC8C2D2), RoundedCornerShape(8.dp))
                     )
@@ -249,7 +249,7 @@ fun AgregarIngresoScreen(onBack: () -> Unit, ingresoViewModel: IngresoViewModel,
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White) // Fondo blanco para ocultar el scroll detrás
+                    .background(Color.White)
                     .padding(top = 16.dp, bottom = 40.dp, start = 30.dp, end = 30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {

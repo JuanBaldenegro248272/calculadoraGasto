@@ -163,13 +163,16 @@ fun AgregarGastoFijoScreen(
                         if (frecuenciaSeleccionada.isBlank()) { errorMessage = "Selecciona una frecuencia."; return@Button }
 
                         val gasto = Gasto(
-                            idGasto = idGastoEditar ?: UUID.randomUUID().toString(),
+                            idGasto = idGastoEditar ?: 0,
                             idUsuarioPaga = usuarioActualId!!,
-                            idCategoria = null, idGrupo = null, idTarjeta = null,
+                            idCategoria = null,
+                            idGrupo = null,
+                            idGastoGrupo = null,
+                            idTarjeta = null,
                             monto = montoDouble, descripcion = descripcion,
                             fecha = LocalDate.now().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
                             tipoPago = TipoPago.EFECTIVO,
-                            lugar = frecuenciaSeleccionada, //para no seguir modificando entidades se opto por agregar la frecuencia en el atributo de la ubicacion (lugar)
+                            lugar = frecuenciaSeleccionada,
                             fotoRecibo = null,
                             esFijo = true
                         )

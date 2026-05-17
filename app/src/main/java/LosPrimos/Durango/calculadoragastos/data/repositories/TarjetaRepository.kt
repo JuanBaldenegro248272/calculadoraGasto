@@ -18,7 +18,7 @@ class TarjetaRepository(private val tarjetaDao: TarjetaDao){
         tarjetaDao.deleteTarjeta(tarjeta)
     }
 
-     fun getAllTarjetasPorUsuario(idUsuario: Int): Flow<List<Tarjeta>>{
+    fun getAllTarjetasPorUsuario(idUsuario: String): Flow<List<Tarjeta>>{
         return tarjetaDao.getTarjetasByUsuario(idUsuario)
     }
 

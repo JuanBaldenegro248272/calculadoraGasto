@@ -78,7 +78,7 @@ import java.util.UUID
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categoriaViewModel: CategoriaViewModel, idGastoEditar: String? = null) {
+fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categoriaViewModel: CategoriaViewModel, idGastoEditar: Int? = null) {
     val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
     var menuCategorias by remember { mutableStateOf(false) }
     var categoriaSeleccionada by remember { mutableStateOf<Categoria?>(null) }
@@ -360,10 +360,11 @@ fun AgregarGastoScreen(onBack: () -> Unit, gastoviewModel: GastoViewModel, categ
                         errorMessage = ""
 
                         val gasto = Gasto(
-                            idGasto = idGastoEditar ?: UUID.randomUUID().toString(),
+                            idGasto = idGastoEditar ?: 0,
                             idUsuarioPaga = usuarioActualId!!,
                             idCategoria = categoriaSeleccionada?.idCategoria,
                             idGrupo = null,
+                            idGastoGrupo = null,
                             idTarjeta = null,
                             monto = montoDouble,
                             descripcion = descripcion,

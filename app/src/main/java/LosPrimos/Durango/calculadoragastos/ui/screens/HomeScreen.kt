@@ -52,13 +52,15 @@ fun HomeScreen(
     categoriaViewModel: CategoriaViewModel
 ) {
     val usuarioActualId by ingresoViewModel.usuarioActualId.collectAsState()
+
+    val presupuestos by presupuestoViewModel.obtenerPresupuesto(usuarioActualId ?: "").collectAsState(initial = emptyList())
+
     val ingresos by ingresoViewModel.obtenerIngresosPorUsuario(usuarioActualId)
         .collectAsState(initial = emptyList())
     val gastos by gastoViewModel.obtenerGastosPorUsuario(usuarioActualId)
         .collectAsState(initial = emptyList())
     val categorias by categoriaViewModel.obtenerCategorias().collectAsState(initial = emptyList())
     val nombresCategorias = listOf("Todas") + categorias.map { it.nombre }
-    val presupuestos by presupuestoViewModel.obtenerPresupuesto(usuarioActualId ?: 0).collectAsState(initial = emptyList())
 
     val ingresosNormales = ingresos.filter { !it.esFijo }
     val gastosNormales = gastos.filter { !it.esFijo }
@@ -266,12 +268,12 @@ fun HomeScreen(
                                                     ExpandableCategoryItem(
                                                         nombreCategoria = nombreCategoria,
                                                         icono = obtenerIconoPorCategoria(nombreCategoria),
-                                                        expandedByDefault = true // en el home apareceran abiertos por default los acordeones
+                                                        expandedByDefault = true
                                                     ) {
                                                         Column {
                                                             listaGastos.forEach { gasto ->
                                                                 SwipeToReveal(
-                                                                    onEdit = { onNavigate(Screen.EditarGasto.createRoute(gasto.idGasto)) },
+                                                                    onEdit = { onNavigate(Screen.EditarGasto.createRoute(gasto.idGasto.toString())) },
                                                                     onDelete = { gastoViewModel.eliminarGasto(gasto) }
                                                                 ) {
                                                                     Box(modifier = Modifier.clickable { gastoSeleccionado = gasto }) {
@@ -304,7 +306,7 @@ fun HomeScreen(
                                                     Column {
                                                         ingresosFiltrados.forEach { ingreso ->
                                                             SwipeToReveal(
-                                                                onEdit = { onNavigate(Screen.EditarIngreso.createRoute(ingreso.idIngreso)) },
+                                                                onEdit = { onNavigate(Screen.EditarIngreso.createRoute(ingreso.idIngreso.toString())) },
                                                                 onDelete = { ingresoViewModel.eliminarIngreso(ingreso) }
                                                             ) {
                                                                 Box(modifier = Modifier.clickable { ingresoSeleccionado = ingreso }) {

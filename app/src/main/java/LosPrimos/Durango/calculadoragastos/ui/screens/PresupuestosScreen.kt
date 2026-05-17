@@ -39,12 +39,18 @@ import LosPrimos.Durango.calculadoragastos.utils.SwipeToReveal
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.IngresoViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.PresupuestoViewModel
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.WarningAmber
+import androidx.compose.ui.text.input.KeyboardType
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import kotlin.math.abs
@@ -65,7 +71,8 @@ fun PresupuestosScreen(
     var ingresoFijoDetalle by remember { mutableStateOf<Ingreso?>(null) }
 
     val usuarioActualId by presupuestoViewModel.usuarioActualId.collectAsState()
-    val usuarioId = usuarioActualId ?: 0
+
+    val usuarioId = usuarioActualId ?: ""
 
     val gastosFijos by gastoViewModel.obtenerGastosFijosPorUsuario(usuarioId).collectAsState(initial = emptyList())
     val ingresosFijos by ingresoViewModel.obtenerIngresosFijosPorUsuario(usuarioId).collectAsState(initial = emptyList())
@@ -166,8 +173,8 @@ fun PresupuestosScreen(
                                     formatoDinero = formatoDinero,
                                     onVerDetalle = { ingreso -> ingresoFijoDetalle = ingreso },
                                     onVerDetalleGasto = { gasto -> gastoFijoDetalle = gasto },
-                                    onEditarIngreso = { ingreso -> onNavigate(Screen.EditarIngresoFijo.createRoute(ingreso.idIngreso)) },
-                                    onEditarGasto = { gasto -> onNavigate(Screen.EditarGastoFijo.createRoute(gasto.idGasto)) },
+                                    onEditarIngreso = { ingreso -> onNavigate(Screen.EditarIngresoFijo.createRoute(ingreso.idIngreso.toString())) },
+                                    onEditarGasto = { gasto -> onNavigate(Screen.EditarGastoFijo.createRoute(gasto.idGasto.toString())) },
                                     onEliminarIngreso = { ingresoViewModel.eliminarIngreso(it) },
                                     onEliminarGasto = { gastoViewModel.eliminarGasto(it) }
                                 )
@@ -241,7 +248,7 @@ private fun FijosPage(
                                 Box(modifier = Modifier.clickable { onVerDetalle(ingreso) }) {
                                     TransactionItem(
                                         titulo = ingreso.descripcion ?: "Sin descripción",
-                                        fecha = ingreso.lugar?.ifEmpty { "Mensual" } ?: "Mensual", // Muestra la Frecuencia
+                                        fecha = ingreso.lugar?.ifEmpty { "Mensual" } ?: "Mensual",
                                         monto = ingreso.monto,
                                         isGasto = false
                                     )
@@ -280,7 +287,7 @@ private fun FijosPage(
                                 Box(modifier = Modifier.clickable { onVerDetalleGasto(gasto) }) {
                                     TransactionItem(
                                         titulo = gasto.descripcion,
-                                        fecha = gasto.lugar.ifEmpty { "Mensual" }, // Muestra la Frecuencia
+                                        fecha = gasto.lugar.ifEmpty { "Mensual" },
                                         monto = gasto.monto,
                                         isGasto = true
                                     )
@@ -296,7 +303,7 @@ private fun FijosPage(
 
 @Composable
 private fun CategoriasPage(
-    usuarioId: Int,
+    usuarioId: String,
     presupuestoViewModel: PresupuestoViewModel,
     presupuestoVivienda: Presupuesto?, montoPresupuestoVivienda: Double, gastadoVivienda: Double,
     presupuestoEntretenimiento: Presupuesto?, montoPresupuestoEntretenimiento: Double, gastadoEntretenimiento: Double,
@@ -312,42 +319,42 @@ private fun CategoriasPage(
         item {
             ExpandableCategoryItem(nombreCategoria = "Vivienda", icono = Icons.Default.Home, expandedByDefault = true) {
                 CategoryBudgetCard("Vivienda", gastadoVivienda, montoPresupuestoVivienda, true) { monto, alertas ->
-                    if (usuarioId != 0) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoVivienda?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 1))
+                    if (usuarioId.isNotBlank()) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoVivienda?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 1))
                 }
             }
         }
         item {
             ExpandableCategoryItem(nombreCategoria = "Transporte", icono = Icons.Default.DirectionsCar) {
                 CategoryBudgetCard("Transporte", gastadoTransporte, montoPresupuestoTransporte, true) { monto, alertas ->
-                    if (usuarioId != 0) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoTransporte?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 3))
+                    if (usuarioId.isNotBlank()) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoTransporte?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 3))
                 }
             }
         }
         item {
             ExpandableCategoryItem(nombreCategoria = "Alimentación", icono = Icons.Default.ShoppingCart) {
                 CategoryBudgetCard("Alimentación", gastadoAlimentacion, montoPresupuestoAlimentacion, true) { monto, alertas ->
-                    if (usuarioId != 0) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoAlimentacion?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 4))
+                    if (usuarioId.isNotBlank()) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoAlimentacion?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 4))
                 }
             }
         }
         item {
             ExpandableCategoryItem(nombreCategoria = "Entretenimiento", icono = Icons.Default.Movie) {
                 CategoryBudgetCard("Entretenimiento", gastadoEntretenimiento, montoPresupuestoEntretenimiento, false) { monto, alertas ->
-                    if (usuarioId != 0) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoEntretenimiento?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 2))
+                    if (usuarioId.isNotBlank()) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoEntretenimiento?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 2))
                 }
             }
         }
         item {
             ExpandableCategoryItem(nombreCategoria = "Salud", icono = Icons.Default.Favorite) {
                 CategoryBudgetCard("Salud", gastadoSalud, montoPresupuestoSalud, true) { monto, alertas ->
-                    if (usuarioId != 0) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoSalud?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 5))
+                    if (usuarioId.isNotBlank()) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoSalud?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 5))
                 }
             }
         }
         item {
             ExpandableCategoryItem(nombreCategoria = "Otros", icono = Icons.Default.MoreHoriz) {
                 CategoryBudgetCard("Otros", gastadoOtros, montoPresupuestoOtros, true) { monto, alertas ->
-                    if (usuarioId != 0) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoOtros?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 6))
+                    if (usuarioId.isNotBlank()) presupuestoViewModel.insertarPresupuesto(Presupuesto(presupuestoOtros?.idPresupuesto ?: 0, monto, 5, 2026, if (alertas) 1 else 0, usuarioId, 6))
                 }
             }
         }
@@ -383,3 +390,257 @@ fun PresupuestosToggle(isFijosSelected: Boolean, onFijosClick: () -> Unit, onCat
     }
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@Composable
+fun PresupuestoSummaryCard(
+    ingresosFijos: Double,
+    gastosFijos: Double,
+    presupuestoUsado: Double,
+    presupuestoTotal: Double
+) {
+    val disponible = ingresosFijos - gastosFijos
+    val progreso = if (presupuestoTotal > 0) (presupuestoUsado / presupuestoTotal).toFloat() else 0f
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.15f)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp)
+    ) {
+        Column(modifier = Modifier.padding(20.dp)) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Column {
+                    Text("Ingresos Fijos", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+                    Text("+$${ingresosFijos}", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                }
+                Column(horizontalAlignment = Alignment.End) {
+                    Text("Gastos Fijos", color = Color.White.copy(alpha = 0.8f), fontSize = 14.sp)
+                    Text("-$${gastosFijos}", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                }
+            }
+
+            Divider(color = Color.White.copy(alpha = 0.3f), thickness = 1.dp, modifier = Modifier.padding(vertical = 12.dp))
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text("Disponible", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text("$$disponible", color = Color.White, fontWeight = FontWeight.ExtraBold, fontSize = 24.sp)
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text("Presupuesto Total", color = Color.White.copy(alpha = 0.8f), fontSize = 12.sp)
+                Text("Usado $$presupuestoUsado / $$presupuestoTotal", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+            LinearProgressIndicator(
+                progress = { progreso.coerceIn(0f, 1f) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                color = MagentaPink,
+                trackColor = Color.White.copy(alpha = 0.3f)
+            )
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@Composable
+fun ExpandableFixedTransactionFAB(
+    onAddIngresoClick: () -> Unit,
+    onAddGastoClick: () -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(horizontalAlignment = Alignment.End) {
+        AnimatedVisibility(visible = expanded) {
+            Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(bottom = 16.dp)) {
+                ExtendedFloatingActionButton(
+                    text = { Text("Añadir Gasto Fijo", color = Color.White, fontWeight = FontWeight.Bold) },
+                    icon = { Icon(Icons.Default.Add, contentDescription = null, tint = Color.White) },
+                    onClick = { expanded = false; onAddGastoClick() },
+                    containerColor = MagentaPink,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                ExtendedFloatingActionButton(
+                    text = { Text("Añadir Ingreso Fijo", color = Color.White, fontWeight = FontWeight.Bold) },
+                    icon = { Icon(Icons.Default.Add, contentDescription = null, tint = Color.White) },
+                    onClick = { expanded = false; onAddIngresoClick() },
+                    containerColor = TealDark
+                )
+            }
+        }
+
+        FloatingActionButton(
+            onClick = { expanded = !expanded },
+            containerColor = TealDark,
+            contentColor = Color.White,
+            shape = CircleShape
+        ) {
+            Icon(
+                imageVector = if (expanded) Icons.Default.Close else Icons.Default.Add,
+                contentDescription = "Expandir"
+            )
+        }
+    }
+}
+
+
+
+
+
+
+
+
+@Composable
+fun CategoryBudgetCard(
+    nombreCategoria: String,
+    gastado: Double,
+    presupuestoAsignado: Double,
+    alertasActivadas: Boolean,
+    onSaveConfig: (nuevoPresupuesto: Double, nuevasAlertas: Boolean) -> Unit
+) {
+    var isEditing by remember { mutableStateOf(false) }
+    var inputPresupuesto by remember { mutableStateOf(presupuestoAsignado.toString()) }
+    var inputAlertas by remember { mutableStateOf(alertasActivadas) }
+
+    val progreso = if (presupuestoAsignado > 0) (gastado / presupuestoAsignado).toFloat() else 0f
+    val isWarning = progreso >= 0.9f
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 8.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(nombreCategoria.uppercase(), fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, color = DarkGrayText, letterSpacing = 1.sp)
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = inputPresupuesto,
+                onValueChange = { inputPresupuesto = it },
+                label = { Text("Presupuesto Asignado") },
+                leadingIcon = { Text("$", color = DarkGrayText) },
+                enabled = isEditing,
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = TealDark,
+                    unfocusedBorderColor = LightBlueGray,
+                    disabledBorderColor = Color.Transparent,
+                    disabledTextColor = DarkGrayText
+                )
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Activar Alertas", fontWeight = FontWeight.Bold, color = DarkGrayText, fontSize = 14.sp)
+                Switch(
+                    checked = inputAlertas,
+                    onCheckedChange = { inputAlertas = it },
+                    enabled = isEditing,
+                    colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = TealLight)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text("${(progreso * 100).toInt()}%", fontWeight = FontWeight.ExtraBold, fontSize = 24.sp, color = if (isWarning) ErrorRed else TealDark)
+                Text("Gastado: $$gastado / $$presupuestoAsignado", color = LightBlueGray, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                LinearProgressIndicator(
+                    progress = { progreso.coerceIn(0f, 1f) },
+                    modifier = Modifier.weight(1f).height(8.dp).clip(RoundedCornerShape(4.dp)),
+                    color = if (isWarning) ErrorRed else TealDark,
+                    trackColor = BackgroundLight
+                )
+                if (isWarning) {
+                    Icon(Icons.Default.WarningAmber, contentDescription = "Advertencia", tint = ErrorRed, modifier = Modifier.padding(start = 8.dp).size(20.dp))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            if (isEditing) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                    OutlinedButton(
+                        onClick = {
+                            isEditing = false
+                            inputPresupuesto = presupuestoAsignado.toString()
+                            inputAlertas = alertasActivadas
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = DarkGrayText)
+                    ) { Text("Cancelar", fontWeight = FontWeight.Bold) }
+
+                    Button(
+                        onClick = {
+                            isEditing = false
+                            val nuevoMonto = inputPresupuesto.toDoubleOrNull() ?: presupuestoAsignado
+                            onSaveConfig(nuevoMonto, inputAlertas)
+                        },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(containerColor = MagentaPink)
+                    ) { Text("Guardar", fontWeight = FontWeight.Bold) }
+                }
+            } else {
+                Button(
+                    onClick = { isEditing = true },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = TealDark),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Configurar", fontWeight = FontWeight.Bold, color = Color.White)
+                }
+            }
+        }
+    }
+}

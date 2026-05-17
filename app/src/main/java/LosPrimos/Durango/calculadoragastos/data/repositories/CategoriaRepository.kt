@@ -22,7 +22,7 @@ class CategoriaRepository(private val categoriaDao: CategoriaDao) {
         return categoriaDao.getCategoriaById(idCategoria).firstOrNull()
     }
 
-     fun getAllCategorias(): Flow<List<Categoria>> {
+    fun getAllCategorias(): Flow<List<Categoria>> {
         return categoriaDao.getAllCategorias()
     }
 }
