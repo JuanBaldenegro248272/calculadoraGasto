@@ -1,6 +1,7 @@
 package LosPrimos.Durango.calculadoragastos.viewModel
 
 import LosPrimos.Durango.calculadoragastos.data.entities.GastoGrupo
+import LosPrimos.Durango.calculadoragastos.data.entities.Grupo
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
@@ -21,6 +22,12 @@ class GastoGrupoViewModel : ViewModel() {
 
     private val _nombresUsuarios = MutableStateFlow<Map<String, String>>(emptyMap())
     val nombresUsuarios: StateFlow<Map<String, String>> = _nombresUsuarios
+
+    private val _totalesPorGrupo = MutableStateFlow<Map<String, Double>>(emptyMap())
+    val totalesPorGrupo: StateFlow<Map<String, Double>> = _totalesPorGrupo
+
+    private val _deudasPorGrupo = MutableStateFlow<Map<String, Double>>(emptyMap())
+    val deudasPorGrupo: StateFlow<Map<String, Double>> = _deudasPorGrupo
 
     private var listenerRegistration: ListenerRegistration? = null
 
@@ -55,8 +62,16 @@ class GastoGrupoViewModel : ViewModel() {
 
     fun agregarGasto(gasto: GastoGrupo) {
         val idNuevo = UUID.randomUUID().toString()
-        val gastoConId = gasto.copy(idGastoGrupo = idNuevo)
-        db.collection("gastosGrupo").document(idNuevo).set(gastoConId)
+        db.collection("grupos").document(gasto.idGrupo).get()
+            .addOnSuccessListener { documento ->
+                val miembros = documento.get("miembrosIds") as? List<*>
+                val cantidadMiembros = miembros?.size ?: 1
+                val gastoConId = gasto.copy(
+                    idGastoGrupo = idNuevo,
+                    cantidadMiembros = cantidadMiembros
+                )
+                db.collection("gastosGrupo").document(idNuevo).set(gastoConId)
+            }
     }
 
     fun actualizarGasto(gasto: GastoGrupo) {
@@ -65,6 +80,31 @@ class GastoGrupoViewModel : ViewModel() {
 
     fun eliminarGasto(gasto: GastoGrupo) {
         db.collection("gastosGrupo").document(gasto.idGastoGrupo).delete()
+    }
+
+    fun cargarResumenesDeGrupos(grupos: List<Grupo>, usuarioId: String) {
+        val nuevosTotales = mutableMapOf<String, Double>()
+        val nuevasDeudas = mutableMapOf<String, Double>()
+
+        grupos.forEach { grupo ->
+            db.collection("gastosGrupo")
+                .whereEqualTo("idGrupo", grupo.idGrupo)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    val gastos = snapshot.toObjects(GastoGrupo::class.java)
+                    val total = gastos.sumOf { it.montoTotal }
+                    val miParte = gastos.sumOf { gasto ->
+                        val miembros = if (gasto.cantidadMiembros <= 0) 1 else gasto.cantidadMiembros
+                        gasto.montoTotal / miembros
+                    }
+
+                    nuevosTotales[grupo.idGrupo] = total
+                    nuevasDeudas[grupo.idGrupo] = miParte
+
+                    _totalesPorGrupo.value = nuevosTotales.toMap()
+                    _deudasPorGrupo.value = nuevasDeudas.toMap()
+                }
+        }
     }
 
     override fun onCleared() {
