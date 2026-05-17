@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
+import LosPrimos.Durango.calculadoragastos.utils.formatCurrency
 import android.R.attr.timeZone
 import android.annotation.SuppressLint
 import android.os.Build
@@ -59,7 +60,7 @@ private fun MiniBalanceCard(
                 Text(titulo, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = SurfaceWhite)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            Text("$${monto}", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = SurfaceWhite)
+            Text(formatCurrency(monto), fontWeight = FontWeight.Bold, fontSize = 14.sp, color = SurfaceWhite)
         }
     }
 }
