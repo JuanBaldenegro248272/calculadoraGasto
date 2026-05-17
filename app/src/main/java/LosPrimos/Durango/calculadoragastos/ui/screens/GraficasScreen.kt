@@ -37,6 +37,10 @@ fun GraficasScreen(
 
     val gastos by gastoViewModel.obtenerGastosPorUsuario(usuarioId)
         .collectAsState(initial = emptyList())
+    val ingresosFijos by ingresoViewModel.obtenerIngresosFijosPorUsuario(usuarioId)
+        .collectAsState(initial = emptyList())
+    val gastosFijos by gastoViewModel.obtenerGastosFijosPorUsuario(usuarioId)
+        .collectAsState(initial = emptyList())
     val presupuestos by presupuestoViewModel.obtenerPresupuesto(usuarioId)
         .collectAsState(initial = emptyList())
     val categorias by categoriaViewModel.obtenerCategorias()
@@ -53,7 +57,16 @@ fun GraficasScreen(
     var categoriaSeleccionada by remember { mutableStateOf("Todas") }
     var mesSeleccionado by remember { mutableStateOf(mesActualTexto) }
 
-    val nombresCategorias = listOf("Todas") + categorias.map { it.nombre }
+    val categoriasParaGrafica = listOf(
+        1 to "Vivienda",
+        2 to "Entretenimiento",
+        3 to "Transporte",
+        4 to "Alimentación",
+        5 to "Salud",
+        6 to "Otros"
+    )
+
+    val nombresCategorias = listOf("Todas") + categoriasParaGrafica.map { it.second }
 
     val gastosFiltrados = remember(gastos, mesSeleccionado, categorias) {
         gastos.filter { gasto ->
@@ -76,31 +89,36 @@ fun GraficasScreen(
             6 to GreenGraph
         )
 
-        categorias
-            .filter { cat ->
-                categoriaSeleccionada == "Todas" || cat.nombre == categoriaSeleccionada
+        categoriasParaGrafica
+            .filter { categoria ->
+                categoriaSeleccionada == "Todas" || categoria.second == categoriaSeleccionada
             }
-            .mapNotNull { cat ->
+            .mapNotNull { categoria ->
+                val idCategoria = categoria.first
+                val nombreCategoria = categoria.second
                 val gastado = gastosFiltrados
-                    .filter { it.idCategoria == cat.idCategoria }
+                    .filter { it.idCategoria == idCategoria }
                     .sumOf { it.monto }
                     .toFloat()
                 val esperado = presupuestos
-                    .find { it.idCategoria == cat.idCategoria }
-                    ?.monto?.toFloat() ?: 0f
+                    .filter { it.idCategoria == idCategoria }
+                    .sumOf { it.monto }
+                    .toFloat()
                 
                 if (gastado == 0f && esperado == 0f) return@mapNotNull null
 
                 CategoriaGraficaData(
-                    nombre = cat.nombre,
+                    nombre = nombreCategoria,
                     gastado = gastado,
                     esperado = esperado,
-                    color = coloresCategorias[cat.idCategoria] ?: GreenGraph
+                    color = coloresCategorias[idCategoria] ?: GreenGraph
                 )
             }
     }
 
-    val presupuestoTotal = presupuestos.sumOf { it.monto }.toFloat()
+    val presupuestoPorCategorias = presupuestos.sumOf { it.monto }.toFloat()
+    val presupuestoBase = (ingresosFijos.sumOf { it.monto } - gastosFijos.sumOf { it.monto }).toFloat()
+    val presupuestoTotal = if (presupuestoPorCategorias > 0f) presupuestoPorCategorias else presupuestoBase
     val totalGastado = gastosFiltrados.sumOf { it.monto }.toFloat()
 
     Scaffold(
