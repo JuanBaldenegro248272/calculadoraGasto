@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import LosPrimos.Durango.calculadoragastos.ui.theme.*
 import LosPrimos.Durango.calculadoragastos.ui.components.*
+import LosPrimos.Durango.calculadoragastos.utils.NetworkConnectivityObserver
 import LosPrimos.Durango.calculadoragastos.utils.SwipeToReveal
 import LosPrimos.Durango.calculadoragastos.viewModel.CategoriaViewModel
 import LosPrimos.Durango.calculadoragastos.viewModel.GastoViewModel
@@ -35,6 +36,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.time.Instant
@@ -76,7 +78,10 @@ fun HomeScreen(
 
 
     var showFabMenu by remember { mutableStateOf(false) }
-    val isOffline = true
+    val context = LocalContext.current
+    val connectivityObserver = remember { NetworkConnectivityObserver(context) }
+    val hasInternet by connectivityObserver.observe().collectAsState(initial = true)
+    val isOffline = !hasInternet
     var categoriaSeleccionada by remember { mutableStateOf("Todas") }
 
     var gastoSeleccionado by remember { mutableStateOf<Gasto?>(null) }
